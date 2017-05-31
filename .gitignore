@@ -1,0 +1,7 @@
+/PhBase/Debug/*.obj
+/PhBase/Debug/*.idb
+/PhBase/Debug/PhBase.tlog/*.tlog
+/PhBase/Debug/*.log
+/PhBase/Debug/PhBase.tlog/*.lastbuildstate
+/Graphics/*.user
+/PhBase/*.user

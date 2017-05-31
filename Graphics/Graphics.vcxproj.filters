@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="render">
+      <UniqueIdentifier>{84cbb15c-0326-47d4-b1ad-0e5350623371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gl">
+      <UniqueIdentifier>{5ca5cf96-33ca-4f34-8e83-95536b3c30f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{940bf83c-dd6f-4170-9de5-c095f74c0029}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GraphicDesc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderStateGL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderOGL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TexOGL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferOGL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GLView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="render\UIWidget.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\Glypher.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\GlyphReader.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="render\GUIRender.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="gl\gl3w.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="gl\glcorearb.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="gl\wglext.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="res\TexPool.h">
+      <Filter>res</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="RenderPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderStateGL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderOGL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TexOGL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferOGL.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GLView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="render\UIWidget.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\Glypher.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\GlyphReader.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="render\GUIRender.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="gl\gl3w.c">
+      <Filter>gl</Filter>
+    </ClCompile>
+    <ClCompile Include="res\TexPool.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
