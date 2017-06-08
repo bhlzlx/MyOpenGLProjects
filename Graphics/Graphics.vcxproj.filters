@@ -22,35 +22,14 @@
     <Filter Include="res">
       <UniqueIdentifier>{940bf83c-dd6f-4170-9de5-c095f74c0029}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{36000dec-94c6-4a3b-96d2-a2c47ea4fd0e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GraphicDesc.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPass.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderStateGL.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderOGL.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="TexOGL.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="BufferOGL.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="GLView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="render\UIWidget.h">
       <Filter>render</Filter>
     </ClInclude>
@@ -75,26 +54,32 @@
     <ClInclude Include="res\TexPool.h">
       <Filter>res</Filter>
     </ClInclude>
+    <ClInclude Include="BufferOGL.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="GLView.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicDesc.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderStateGL.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderOGL.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="TexOGL.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="RenderPass.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderStateGL.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ShaderOGL.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="TexOGL.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="BufferOGL.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="GLView.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="render\UIWidget.cpp">
       <Filter>render</Filter>
     </ClCompile>
@@ -112,6 +97,24 @@
     </ClCompile>
     <ClCompile Include="res\TexPool.cpp">
       <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferOGL.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="GLView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderStateGL.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderOGL.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="TexOGL.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

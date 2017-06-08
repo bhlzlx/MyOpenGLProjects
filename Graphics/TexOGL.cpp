@@ -11,29 +11,6 @@ namespace ph
 		if( ret == 0)
 			png_error(s_ptr, "pngReaderCallback failed");
     }
-	
-	GLenum TexFilter2GL( TEX_FILTER filter )
-	{
-		switch( filter )
-		{
-			case TEX_FILTER_POINT: return GL_NEAREST;
-			case TEX_FILTER_LINEAR: return GL_LINEAR;
-			case TEX_FILTER_MIP_POINT: return GL_NEAREST_MIPMAP_NEAREST;
-			case TEX_FILTER_MIP_LINEAR: return GL_LINEAR_MIPMAP_LINEAR;
-			default : return GL_NEAREST;
-		}
-	}
-	
-	GLenum TexAddress2GL( TEX_ADDRESS addr )
-	{
-		switch( addr )
-		{
-			case TEX_ADDRESS_REPEAT: return GL_REPEAT;
-			case TEX_ADDRESS_CLAMP: return GL_CLAMP_TO_EDGE;
-			case TEX_ADDRESS_MIRROR: return GL_MIRRORED_REPEAT;
-			default: return GL_REPEAT;
-		}
-	}
     
     GLint PixelSize( PIXEL_FORMAT format )
     {
@@ -122,10 +99,17 @@ namespace ph
 		TexOGL * tex = new TexOGL;
 		glGenTextures(1, &tex->tex);
 		__gl_check_error__
-			glBindTexture(GL_TEXTURE_2D, tex->tex);
+		glBindTexture(GL_TEXTURE_2D, tex->tex);
 		__gl_check_error__
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA8, _width, _height, 0, GL_ALPHA, GL_FLOAT, NULL); __gl_check_error__
-			tex->desc.format = PIXEL_FORMAT_A8;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA8, _width, _height, 0, GL_ALPHA, GL_FLOAT, NULL); __gl_check_error__		
+		SamplerState  samplerState;		
+		samplerState.MagFilter = TEX_FILTER_POINT;
+		samplerState.MinFilter = TEX_FILTER_POINT;
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TexFilter2GL(samplerState.MinFilter)); __gl_check_error__
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TexFilter2GL(samplerState.MagFilter)); __gl_check_error__
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TexAddress2GL(samplerState.AddressU)); __gl_check_error__
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TexAddress2GL(samplerState.AddressV)); __gl_check_error__
+		tex->desc.format = PIXEL_FORMAT_A8;
 		tex->desc.size.w = _width;
 		tex->desc.size.h = _height;
 		return tex;
@@ -276,26 +260,10 @@ namespace ph
 		return &desc;
 	}
 
-	void TexOGL::SetSampler(SamplerState& _sampler)
+	void TexOGL::BindToActivedSlot()
 	{
-		sampler.SetDesc( _sampler );
-	}
-
-	bool TexOGL::Bind( ShaderOGL* _shader, const char* _name )
-	{
-        __gl_check_error__
-		GLint slot = _shader->BindTexture2D( _name );
-        __gl_check_error__
-		if(slot == 0xff )
-		{
-			return false;
-		}
-		glActiveTexture(GL_TEXTURE0+slot);
-        __gl_check_error__
 		glBindTexture(GL_TEXTURE_2D, this->tex);
-        __gl_check_error__
-		this->sampler.Bind( slot );
-		return true;
+		__gl_check_error__
 	}
     
     void TexOGL::Release()

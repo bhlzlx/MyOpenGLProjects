@@ -166,7 +166,6 @@ namespace ph
 	public:
 		static VertexArray * New(IBindable * _vb, IBindable * _ib, VertexArray::Layout* _layout);
 		void Bind();
-		void DrawTriangle(GLsizei _nPoints);
 		void Release();
 	};
 

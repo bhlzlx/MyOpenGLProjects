@@ -20,7 +20,7 @@ namespace ph
 		});
 		vertexArray->Init();
 		// 
-		glypher.Init("font.ttf");
+		glypher.Init("LISHU.ttf");
 		//glypher.Init("font.ttf");
 		// shader
 		IBlob * vert = _arch->Open("GUIRender.vert");
@@ -28,6 +28,15 @@ namespace ph
 		shader = ShaderOGL::CreateShader(vert->GetBuffer(), frag->GetBuffer());
 		vert->Release();
 		frag->Release();
+		baseTexSlot = shader->GetSamplerSlot("PrimTexSampler");
+		maskTexSlot = shader->GetSamplerSlot("MaskTexSampler");
+
+		ph::SamplerState ss;
+		ss.MagFilter = ph::TEX_FILTER_LINEAR;
+		ss.MinFilter = ph::TEX_FILTER_LINEAR;
+		this->baseTexSlot->SetSamplerState(ss);
+		this->maskTexSlot->SetSamplerState(ss);		
+
 		if (!shader)
 		{
 			return false;
@@ -44,8 +53,8 @@ namespace ph
 
 	void GUIRender::Begin()
 	{
-		renderState.Apply();
-		shader->Bind();
+		renderState.Apply(); __gl_check_error__
+		shader->Bind(); __gl_check_error__
 		vertexArray->Bind();
 	}
 
@@ -95,8 +104,8 @@ namespace ph
 	{
 		for (const auto& it : _widget->vecRenderTargets)
 		{
-			it.texture->Bind(this->shader, "PrimTexSampler");
-			it.mask->Bind(this->shader, "MaskTexSampler");
+			baseTexSlot->BindTexture( it.texture.get() );
+			maskTexSlot->BindTexture( it.mask.get() );
 			shader->SetUniform("Color",1, (void*)(&it.color));
 			shader->SetUniform("Gray", 1, (void*)(&it.gray));
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(sizeof(PhU32)* it.vertId * 6));

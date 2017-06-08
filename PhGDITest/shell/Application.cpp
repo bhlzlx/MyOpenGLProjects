@@ -46,12 +46,12 @@ void Application::Start(void* _hwnd)
 	arch->Init(rootdir.c_str());
 	ph::TexPool::InitTexPool(arch);
 
-	script::GetScriptEngine()->Init();
+	/*script::GetScriptEngine()->Init();
 	uiv2::regist_to_script();
-
+	*/
 	render = ph::GUIRender::GetInstance(arch);
 
-	gTex = ph::TexPool::Get("system/texture/battlecity.png");
+	gTex = ph::TexPool::Get("system/texture/axe.png");
 }
 
 void Application::OnResize( int _w, int _h )
@@ -83,57 +83,6 @@ void Application::End()
 
 void Application::OnRender(unsigned long _tick)
 {
-	static PhU16 dir;
-	++dir;
-	if (dir >= 4)
-	{
-		dir = 0;
-	}
-
-	RRC rrc;
-	rrc.MtcXMin = 0.0f; rrc.MtcXMax = 1.0f; rrc.MtcYMin = 0.0f; rrc.MtcYMax = 1.0f;
-	tankWidget.Begin();
-	rrc.Color = 0xffffffff; rrc.Gray = 0;
-	rrc.PosXMin = 0; rrc.PosXMax = 32; rrc.PosYMin = 0.0f; rrc.PosYMax = 32;
-
-	rect<float> tc;
-	tc.bottom = 0.0f; tc.top = 32.0f;
-
-	switch (dir)
-	{
-	case 0:
-	{
-		tc.left = 64.0f; tc.right = 96.0f;
-		break;
-	}
-	case 1:
-	{
-		tc.left = 96.0f; tc.right = 128.0f;
-		break;
-	}
-	case 2:
-	{
-		tc.left = 0.0f; tc.right = 32.0f;
-		break;
-	}
-	case 3:
-	{
-		tc.left = 32.0f; tc.right = 64.0f;
-		break;
-	}
-	default:
-		break;
-	}
-
-	rrc.TcXMin = tc.left / 512.0f;
-	rrc.TcXMax = tc.right / 512.0f;
-	rrc.TcYMin = tc.bottom / 512.0f;
-	rrc.TcYMax = tc.top / 512.0f;
-	rrc.Color = 0xff0000ff;
-
-	tankWidget.Build(rrc, gTex, nullptr, 0);
-	tankWidget.End();
-
 	view->Begin(); __gl_check_error__
 	render->Begin();
 	render->Draw(&tankWidget);
@@ -142,13 +91,14 @@ void Application::OnRender(unsigned long _tick)
 
 void Application::OnKeyEvent( unsigned char _key, eKeyEvent _event )
 {
+	ph::UIWidget::DefScissor(0, 1024, 0, 1024);
 	if( _event == eKeyDown )
 	{
 		RRC rrc;
 		rrc.MtcXMin = 0.0f; rrc.MtcXMax = 1.0f; rrc.MtcYMin = 0.0f; rrc.MtcYMax = 1.0f;
 		tankWidget.Begin();
 		rrc.Color = 0xffffffff; rrc.Gray = 0;
-		rrc.PosXMin = 0; rrc.PosXMax = 32; rrc.PosYMin = 0.0f; rrc.PosYMax = 32;
+		rrc.PosXMin = 0; rrc.PosXMax = 64; rrc.PosYMin = 0.0f; rrc.PosYMax = 64;
 
 		rect<float> tc;
 		tc.bottom = 0.0f; tc.top = 32.0f;
@@ -179,13 +129,25 @@ void Application::OnKeyEvent( unsigned char _key, eKeyEvent _event )
 			break;
 		}
 
-		rrc.TcXMin = tc.left / 512.0f;
-		rrc.TcXMax = tc.right / 512.0f;
-		rrc.TcYMin = tc.bottom / 512.0f;
-		rrc.TcYMax = tc.top / 512.0f;
-		rrc.Color = 0xff0000ff;
+		rrc.TcXMin = tc.left / 205.0f;
+		rrc.TcXMax = tc.right / 205.0f;
+		rrc.TcYMin = tc.bottom / 115.0f;
+		rrc.TcYMax = tc.top / 115.0f;
+		rrc.Color = 0xffffffff;
 
 		tankWidget.Build(rrc, gTex, nullptr, 0);
+
+		char16_t message[] = u"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789中国智造，慧及全球。";
+
+		ph::UIText text;
+		text.x = 0;
+		text.y = 0;
+		text.size = 24;
+		text.length = sizeof(message) / sizeof(char16_t) - 1;
+		text.text = message;
+		text.color = 0xff0000ff;
+		text.charGap = 0.0f;
+		tankWidget.Build(text, 1);
 		tankWidget.End();
 	}
 }

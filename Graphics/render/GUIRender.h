@@ -18,6 +18,10 @@ namespace ph
 		std::shared_ptr< UIVertexArray >	vertexArray;
 		// shader
 		ShaderOGL *		shader;
+		//
+		SamplerSlotRef	baseTexSlot;
+		SamplerSlotRef	maskTexSlot;
+
 		RenderStateGL   renderState;
 		Glypher			glypher;
 		// 

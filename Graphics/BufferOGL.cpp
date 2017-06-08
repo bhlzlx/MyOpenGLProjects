@@ -80,20 +80,14 @@ namespace ph
 
 	void VertexArray::Bind()
 	{
-		glBindVertexArray(va);
-		vb->Bind();
-		ib->Bind();
+		glBindVertexArray(va); __gl_check_error__
+		vb->Bind(); __gl_check_error__
+		ib->Bind(); __gl_check_error__
 		for (int i = 0; i<nlayout; ++i)
 		{
-			glEnableVertexAttribArray(layouts[i].index); 
-			glVertexAttribPointer(layouts[i].index, layouts[i].size, layouts[i].type, GL_FALSE, layouts[i].stride, layouts[i].offset);
+			glEnableVertexAttribArray(layouts[i].index); __gl_check_error__
+			glVertexAttribPointer(layouts[i].index, layouts[i].size, layouts[i].type, GL_FALSE, layouts[i].stride, layouts[i].offset); __gl_check_error__
 		}
-		__gl_check_error__
-	}
-
-	void VertexArray::DrawTriangle(GLsizei _nPoints)
-	{
-		glDrawElements(GL_TRIANGLES, _nPoints, GL_UNSIGNED_INT, NULL);
 	}
 
 	void VertexArray::Release()

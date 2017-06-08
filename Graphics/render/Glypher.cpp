@@ -90,8 +90,9 @@ namespace ph
 		//int offsetY = (face->glyph->metrics.vertAdvance >> 6) - bitmap_height;// (face->glyph->metrics.horiBearingY >> 6) - (face->bbox.yMin) - bitmap_height;
 		//int offsetY = (face->glyph->advance.x>>6) - face->glyph->bitmap_top - face->glyph->bitmap.rows;
 		int offsetY = (face->glyph->metrics.horiBearingY >> 6) - bitmap_height - (face->size->metrics.descender >> 6);
-		int offsetX = face->glyph->metrics.horiBearingX >> 6;
-		int glyph_width = face->glyph->metrics.horiAdvance >> 6;
+		//int offsetX = face->glyph->metrics.horiBearingX >> 6;
+		int offsetX = face->glyph->bitmap_left;
+		int glyph_width = face->glyph->advance.x >> 6;
 
 		////////////////////////////////////////////
 		std::shared_ptr<GlyphRenderDesc> desc = std::shared_ptr<GlyphRenderDesc>(new GlyphRenderDesc);

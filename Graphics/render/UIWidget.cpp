@@ -324,13 +324,19 @@ namespace ph
 					++i;
 					continue;
 				}
+				else if (_text.text[i] == u' ')
+				{
+					baseX += glypher->FaceHeight(_text.size) / 2;
+					++i;
+					continue;
+				}
 			}
 			ph::GD gd;
 			gd.bound = _text.size;
 			gd.unicode = _text.text[i];
 			ph::GRDRef grd = glypher->Get(gd);
-			// 
-			rrc.PosXMin = (float)grd->penx + baseX;
+
+			rrc.PosXMin = baseX +(float)grd->penx;
 			rrc.PosXMax = (float)grd->bmpWidth + rrc.PosXMin;
 			rrc.PosYMin = (float)grd->peny + _text.y;
 			rrc.PosYMax = (float)grd->bmpHeight + rrc.PosYMin;
@@ -340,55 +346,15 @@ namespace ph
 			rrc.MtcYMin = grd->tcyMin;
 			rrc.MtcYMax = grd->tcyMax;
 
-			/*rrc.TcXMin = grd->tcxMin;
-			rrc.TcXMax = grd->tcxMax;
-			rrc.TcYMin = grd->tcyMin;
-			rrc.TcYMax = grd->tcyMax;*/
-
 			rrc.TcXMin = 0.25f;
 			rrc.TcXMax = 0.75f;
 			rrc.TcYMin = 0.25f;
 			rrc.TcYMax = 0.75f;
 
-
-		/*	rrc.TcXMin = grd->tcxMin;
-			rrc.TcXMax = grd->tcxMax;
-			rrc.TcYMin = grd->tcyMin;
-			rrc.TcYMax = grd->tcyMax;*/
-
-			//
 			vecGRDRef.push_back( grd );
 			TexOGLRef texture = glypher->GetCanvasTexRef(grd->canvasId);
-			// 裁剪 放在另一个BUILD里处理了
-			/*rect<float> clipped;
-			rect<float> * pos = (rect<float> *)&rrc;
-			rect<float> * tc = pos + 1;
-			rect<float> * mtc = tc + 1;
-			bool clipRet = __TheScissor.clip(*pos, clipped);
-			if (clipRet)
-			{
-				if (!memcmp(pos, &clipped, sizeof(rect<float>)) == 0)
-				{
-					ph::GDIRenderRectExt ClippedRRC;
-					ClippedRRC.Color = rrc.Color;
-					ClippedRRC.Gray = rrc.Gray;
-					rect<float> * clippedPos = (rect<float> *)&ClippedRRC;
-					rect<float> * clippedTc = clippedPos + 1;
-					rect<float> * clippedMtc = clippedTc + 1;
-					rect<float> param;
-					calc_rect_rel_param(*pos, clipped, param);
-					calc_rect_from_rel_param(*tc, param, *clippedTc);
-					calc_rect_from_rel_param(*mtc, param, *clippedMtc);
-					*clippedPos = clipped;
-					this->Build(ClippedRRC, nullptr, texture, _layer);
-				}
-				else
-				{
-					this->Build(rrc, nullptr, texture, _layer);
-				}
-			}*/
 			this->Build(rrc, nullptr, texture, _layer);
-			baseX += grd->width;
+			baseX = rrc.PosXMax;
 			baseX += _text.charGap;
 			++i;
 		}

@@ -1,4 +1,5 @@
 #include "ShaderOGL.h"
+#include "TexOGL.h"
 #include <cassert>
 
 namespace ph
@@ -118,6 +119,8 @@ namespace ph
 			}
 
 			strcpy(item.name, namebuff);
+			std::shared_ptr< SamplerSlot > slot( new SamplerSlot(item.name, item.id, item.index ));
+			shader->m_samplerSlots.push_back(slot);
 			shader->m_vecUniform.push_back(item);
 		}
 		return shader;
@@ -139,6 +142,18 @@ namespace ph
 			++iter;
 		}
 		return 0xff;
+	}
+
+	SamplerSlotRef ShaderOGL::GetSamplerSlot(const char * _name)
+	{
+		for (auto& slot : m_samplerSlots)
+		{
+			if (slot->slotName == _name)
+			{
+				return slot;
+			}
+		}
+		return nullptr;
 	}
 
 	void ShaderOGL::Release()
@@ -236,6 +251,40 @@ namespace ph
 			iter++;
 		}
 		return false;
+	}
+
+
+	SamplerSlot::SamplerSlot(const char * _name, GLuint _loc, GLuint _slot)
+	{
+		slotName = _name;
+		uniformLoc = _loc;
+		slot = _slot;
+	}
+
+	void SamplerSlot::BindTexture(TexOGL* _texture)
+	{
+		// 把sampler绑定给 GL_TEXTUREX 的绑定槽
+		glUniform1i(uniformLoc, slot); __gl_check_error__
+		// 激活绑定槽
+		glActiveTexture(GL_TEXTURE0 + slot); __gl_check_error__
+		// 绑定纹理到绑定槽
+		_texture->BindToActivedSlot(); __gl_check_error__
+		// 设置纹理采样器状态???????
+		glActiveTexture(GL_TEXTURE0 + slot); __gl_check_error__
+		glUniform1i(uniformLoc, slot); __gl_check_error__
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TexFilter2GL(samplerState.MinFilter)); __gl_check_error__
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TexFilter2GL(samplerState.MagFilter)); __gl_check_error__
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, TexAddress2GL(samplerState.AddressU)); __gl_check_error__
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, TexAddress2GL(samplerState.AddressV)); __gl_check_error__
+	}
+
+	void SamplerSlot::SetSamplerState(const SamplerState & _samplerState)
+	{
+		samplerState = _samplerState;
+	}
+
+	void SamplerSlot::ApplySamplerState()
+	{
 	}
 }
 
