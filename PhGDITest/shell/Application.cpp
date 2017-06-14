@@ -9,7 +9,6 @@
 #include <render/GUIRender.h>
 #include <render/UIWidget.h>
 #include <render/Glypher.h>
-#include <UIv2.h>
 
 typedef ph::UIWidget Widget;
 typedef ph::GUIRender Render;
@@ -100,7 +99,7 @@ void Application::OnKeyEvent( unsigned char _key, eKeyEvent _event )
 		rrc.Color = 0xffffffff; rrc.Gray = 0;
 		rrc.PosXMin = 0; rrc.PosXMax = 64; rrc.PosYMin = 0.0f; rrc.PosYMax = 64;
 
-		rect<float> tc;
+		ph::rect<float> tc;
 		tc.bottom = 0.0f; tc.top = 32.0f;
 		
 		switch( _key )

@@ -75,7 +75,7 @@ namespace ph
 		}
 
 		// 如果没有相交，返回false
-		bool clip(rect& _other, rect& _result) const
+		bool clip(const rect& _other, rect& _result) const
 		{
 			_result.left = this->left > _other.left ? this->left : _other.left;
 			_result.right = this->right < _other.right ? this->right : _other.right;

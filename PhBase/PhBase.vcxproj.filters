@@ -93,6 +93,9 @@
     <ClInclude Include="3RD\log4z\log4z.h">
       <Filter>3RD\log4z</Filter>
     </ClInclude>
+    <ClInclude Include="QTree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Archive.cpp">
@@ -190,6 +193,9 @@
     </ClCompile>
     <ClCompile Include="3RD\log4z\log4z.cpp">
       <Filter>3RD\log4z</Filter>
+    </ClCompile>
+    <ClCompile Include="QTree.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
