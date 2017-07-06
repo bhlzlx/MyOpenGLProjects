@@ -25,7 +25,7 @@ namespace ph
 		}
 	};
 
-	class IBufferOGL:IBindable
+	class IBufferOGL:public IBindable
 	{
 	public:
 		virtual void Bind() = 0;
@@ -44,8 +44,8 @@ namespace ph
 		PhSizeT     size;
 	public:
 		static StaticVB* New(const void * _data, PhSizeT _size);
-		void Bind();
-		void Release();
+		virtual void Bind();
+		virtual void Release();
 	};
 
 	class StaticIB :public IBufferOGL

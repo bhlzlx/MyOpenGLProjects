@@ -79,7 +79,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)/freetype-2.8/include;$(SolutionDir)/PhBase/3RD;$(SolutionDir);</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -145,10 +145,11 @@
     <ClInclude Include="graphics.h" />
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="RenderStateGL.h" />
+    <ClInclude Include="render\Basic3DRender.h" />
     <ClInclude Include="render\Glypher.h" />
-    <ClInclude Include="render\GlyphReader.h" />
     <ClInclude Include="render\GUIRender.h" />
     <ClInclude Include="render\UIWidget.h" />
+    <ClInclude Include="res\ObjModelLoader.h" />
     <ClInclude Include="res\TexPool.h" />
     <ClInclude Include="ShaderOGL.h" />
     <ClInclude Include="TexOGL.h" />
@@ -159,10 +160,11 @@
     <ClCompile Include="gl\gl3w.c" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="RenderStateGL.cpp" />
+    <ClCompile Include="render\Basic3DRender.cpp" />
     <ClCompile Include="render\Glypher.cpp" />
-    <ClCompile Include="render\GlyphReader.cpp" />
     <ClCompile Include="render\GUIRender.cpp" />
     <ClCompile Include="render\UIWidget.cpp" />
+    <ClCompile Include="res\ObjModelLoader.cpp" />
     <ClCompile Include="res\TexPool.cpp" />
     <ClCompile Include="ShaderOGL.cpp" />
     <ClCompile Include="TexOGL.cpp" />

@@ -66,6 +66,7 @@ namespace ph
 			{
 				glEnable(GL_DEPTH_TEST);
 				glDepthFunc(Cmpfunc2GL(rs.depthFunc));
+				//glDepthFunc(GL_LESS );
 			}
 			else
 			{

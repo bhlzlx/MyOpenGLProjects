@@ -66,7 +66,7 @@ namespace ph
 		//int dpi = 96;
 		//int point_size = dpi * _desc.bound / 72;
 
-		int error = FT_Set_Char_Size(face, _desc.bound << 6, 0, 72, 72);
+		int error = FT_Set_Char_Size(face, _desc.bound << 6, 0, 96, 96);
 
 		int glyphIndex = FT_Get_Char_Index(face, _desc.unicode);
 		if (glyphIndex == 0)

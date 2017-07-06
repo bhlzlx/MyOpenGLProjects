@@ -129,13 +129,13 @@ namespace ph
 			GLuint newBuffer;
 
 			glBindBuffer(GL_COPY_READ_BUFFER, buffer); __gl_check_error__
-				glGenBuffers(1, &newBuffer); __gl_check_error__
-				glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer); __gl_check_error__
-				glBufferData(GL_COPY_WRITE_BUFFER, newCapacity, nullptr, GL_DYNAMIC_DRAW); __gl_check_error__
+			glGenBuffers(1, &newBuffer); __gl_check_error__
+			glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer); __gl_check_error__
+			glBufferData(GL_COPY_WRITE_BUFFER, newCapacity, nullptr, GL_DYNAMIC_DRAW); __gl_check_error__
 
-				glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, this->size); __gl_check_error__
-				glDeleteBuffers(1, &this->buffer); __gl_check_error__
-				this->buffer = newBuffer;
+			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, this->size); __gl_check_error__
+			glDeleteBuffers(1, &this->buffer); __gl_check_error__
+			this->buffer = newBuffer;
 			this->capacity = newCapacity;
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, this->buffer);

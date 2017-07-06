@@ -4,6 +4,7 @@
 #include <PhBase/PhBase.h>
 #include <vector>
 #include <gl/gl3w.h>
+#include <assert.h>
 #include "GraphicDesc.h"
 
 namespace ph
@@ -49,6 +50,38 @@ namespace ph
 		void ApplySamplerState();
 	};
 
+	struct UniformBufferObject
+	{
+		GLuint blockIndex;
+		GLuint bindSlotID;
+		GLuint bufObj;
+		GLuint bufSize;
+
+		void Bind()
+		{
+			glBindBufferBase(GL_UNIFORM_BUFFER, bindSlotID, bufObj );
+		}
+
+		void WriteData( const void * _data, size_t _offset, size_t _size)
+		{
+			assert( _offset + _size <= bufSize );
+			glBindBuffer(GL_UNIFORM_BUFFER, bufObj);
+			glBufferSubData(GL_UNIFORM_BUFFER, _offset, _size, _data);
+		}
+
+		UniformBufferObject()
+		{
+			blockIndex = bindSlotID = bufObj = bufSize = 0;
+		}
+
+		~UniformBufferObject()
+		{
+			glDeleteBuffers(1, &bufObj);
+		}
+	};
+
+	typedef std::shared_ptr< UniformBufferObject > UniformBufferObjectRef;
+
 	typedef std::shared_ptr< SamplerSlot > SamplerSlotRef;
 
     class ShaderOGL
@@ -80,6 +113,7 @@ namespace ph
 		bool SetUniform( const char * _name, int _count, void * _data );
 		GLuint BindTexture2D( const char * _uniform );
 		SamplerSlotRef GetSamplerSlot( const char * _name );
+		UniformBufferObjectRef AllocUniformBufferObject(const char * _name, size_t _bindSlotID );
 	};
 }
 

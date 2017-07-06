@@ -20,7 +20,7 @@ namespace ph
 		});
 		vertexArray->Init();
 		// 
-		glypher.Init("LISHU.ttf");
+		glypher.Init("MinecraftAE.ttf");
 		//glypher.Init("font.ttf");
 		// shader
 		IBlob * vert = _arch->Open("GUIRender.vert");
@@ -32,8 +32,8 @@ namespace ph
 		maskTexSlot = shader->GetSamplerSlot("MaskTexSampler");
 
 		ph::SamplerState ss;
-		ss.MagFilter = ph::TEX_FILTER_LINEAR;
-		ss.MinFilter = ph::TEX_FILTER_LINEAR;
+		ss.MagFilter = ph::TEX_FILTER_POINT;
+		ss.MinFilter = ph::TEX_FILTER_POINT;
 		this->baseTexSlot->SetSamplerState(ss);
 		this->maskTexSlot->SetSamplerState(ss);		
 

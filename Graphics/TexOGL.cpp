@@ -101,7 +101,7 @@ namespace ph
 		__gl_check_error__
 		glBindTexture(GL_TEXTURE_2D, tex->tex);
 		__gl_check_error__
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA8, _width, _height, 0, GL_ALPHA, GL_FLOAT, NULL); __gl_check_error__		
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, _width, _height, 0, GL_RED, GL_UNSIGNED_BYTE, NULL); __gl_check_error__
 		SamplerState  samplerState;		
 		samplerState.MagFilter = TEX_FILTER_POINT;
 		samplerState.MinFilter = TEX_FILTER_POINT;

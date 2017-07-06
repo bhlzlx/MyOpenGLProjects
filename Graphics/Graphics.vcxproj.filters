@@ -36,9 +36,6 @@
     <ClInclude Include="render\Glypher.h">
       <Filter>render</Filter>
     </ClInclude>
-    <ClInclude Include="render\GlyphReader.h">
-      <Filter>render</Filter>
-    </ClInclude>
     <ClInclude Include="render\GUIRender.h">
       <Filter>render</Filter>
     </ClInclude>
@@ -78,15 +75,18 @@
     <ClInclude Include="TexOGL.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="res\ObjModelLoader.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="render\Basic3DRender.h">
+      <Filter>render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="render\UIWidget.cpp">
       <Filter>render</Filter>
     </ClCompile>
     <ClCompile Include="render\Glypher.cpp">
-      <Filter>render</Filter>
-    </ClCompile>
-    <ClCompile Include="render\GlyphReader.cpp">
       <Filter>render</Filter>
     </ClCompile>
     <ClCompile Include="render\GUIRender.cpp">
@@ -115,6 +115,12 @@
     </ClCompile>
     <ClCompile Include="TexOGL.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="res\ObjModelLoader.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="render\Basic3DRender.cpp">
+      <Filter>render</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

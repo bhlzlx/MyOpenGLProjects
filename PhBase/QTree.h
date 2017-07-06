@@ -25,7 +25,48 @@ namespace ph
 		QTreeCell m_rootCell;
 		std::vector< std::vector< ElementType > > dataArray;
 
-		void Insert(ElementType _ele, const rect<RT>& _rc)
+		void Delete(const ElementType& _ele, const rect<RT>& _rc)
+		{
+			std::vector<size_t> collidedIncides;
+			std::stack< QTreeCell* > stk;
+			stk.push(&m_rootCell);
+
+			rect<RT> clipRt;
+
+			while (!stk.empty())
+			{
+				QTreeCell * c = stk.top();
+				stk.pop();
+				if (c->rc.clip(_rc, clipRt))
+				{
+					if (c->lvl == MAXLVL - 1)
+					{
+						collidedIncides.push_back(c->index);
+					}
+					else
+					{
+						stk.push(c->x1y1);
+						stk.push(c->x2y1);
+						stk.push(c->x1y2);
+						stk.push(c->x2y2);
+					}
+				}
+			}
+
+			for (auto& index : collidedIncides)
+			{
+				for (auto& iter = dataArray[index].begin(); iter != dataArray.end();)
+				{
+					if (*iter == _ele)
+					{
+						dataArray[index].erase( iter );
+						break;
+					}
+				}
+			}
+		}
+
+		void Insert(const ElementType& _ele, const rect<RT>& _rc)
 		{
 			std::vector<size_t> collidedIncides;
 			std::stack< QTreeCell* > stk;
@@ -61,8 +102,10 @@ namespace ph
 
 		void EnumElements(const rect<RT>& _rc, std::vector< ElementType >& _vecElements )
 		{
-			std::vector<size_t> collidedIncides;
-			std::stack< QTreeCell* > stk;
+			static std::vector<size_t> collidedIncides;
+			static std::stack< QTreeCell* > stk;
+			collidedIncides.clear();
+
 			stk.push(&m_rootCell);
 
 			rect<RT> clipRt;

@@ -9,17 +9,26 @@
 #include <render/GUIRender.h>
 #include <render/UIWidget.h>
 #include <render/Glypher.h>
+#include <res/ObjModelLoader.h>
+#include <render/Basic3DRender.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 typedef ph::UIWidget Widget;
 typedef ph::GUIRender Render;
+typedef ph::Basic3DRender ModelRender;
 typedef ph::GDIRenderRectExt RRC;
 typedef ph::TexOGLRef Texture;
 
 Widget  tankWidget;
 Render* render;
+ModelRender * modelRender;
 Texture gTex;
 
+glm::mat4x4 matProj;
+glm::mat4x4 matView;
+glm::mat4x4 matModel;
 
+ph::Model3D model;
 
 Application::Application()
 {    
@@ -49,7 +58,11 @@ void Application::Start(void* _hwnd)
 	uiv2::regist_to_script();
 	*/
 	render = ph::GUIRender::GetInstance(arch);
+	modelRender = new ph::Basic3DRender();
+	modelRender->Init(arch);
 
+	model = ph::CreateModel3D("./Mickey_Mouse.obj");
+//model = ph::CreateModel3D("./low-poly-mill.obj");
 	gTex = ph::TexPool::Get("system/texture/axe.png");
 }
 
@@ -69,6 +82,11 @@ void Application::OnResize( int _w, int _h )
 
 	view->Resize(_w, _h);
 	ph::GUIRender::GUIViewport(_w, _h);
+
+	matProj = glm::perspectiveFov<float>(120, _w, _h, 0.1f, 500.0f);
+	matView = glm::lookAt(glm::vec3(0, 20, -20), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	matModel = glm::mat4x4();
+
 }
 
 void Application::End()
@@ -82,15 +100,21 @@ void Application::End()
 
 void Application::OnRender(unsigned long _tick)
 {
+	static float angle = 0.0f;
+	angle += 0.05f;
+	matModel = glm::rotate( glm::mat4x4(), angle, glm::vec3(0, 1, 0));
 	view->Begin(); __gl_check_error__
 	render->Begin();
 	render->Draw(&tankWidget);
+	modelRender->Begin(matView, matProj);
+	modelRender->Draw(matModel, model);
+	modelRender->End();
     view->End();
 }
 
 void Application::OnKeyEvent( unsigned char _key, eKeyEvent _event )
 {
-	ph::UIWidget::DefScissor(0, 1024, 0, 1024);
+	ph::UIWidget::DefScissor(0, 2048, 0, 2048);
 	if( _event == eKeyDown )
 	{
 		RRC rrc;
@@ -141,11 +165,11 @@ void Application::OnKeyEvent( unsigned char _key, eKeyEvent _event )
 		ph::UIText text;
 		text.x = 0;
 		text.y = 0;
-		text.size = 24;
+		text.size = 14;
 		text.length = sizeof(message) / sizeof(char16_t) - 1;
 		text.text = message;
 		text.color = 0xff0000ff;
-		text.charGap = 0.0f;
+		text.charGap = 1.0f;
 		tankWidget.Build(text, 1);
 		tankWidget.End();
 	}

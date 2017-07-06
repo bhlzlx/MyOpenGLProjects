@@ -4,6 +4,7 @@ namespace ph
 {
 	struct Blob :public IBlob
 	{
+		std::string m_filepath;
 		// Ö¸Õë
 		char*		m_pData;
 		char*		m_pCurr;
@@ -140,6 +141,11 @@ namespace ph
 			delete this;
 		}
 
+		const char * Filepath()
+		{
+			return m_filepath.c_str();
+		}
+
 		~Blob()
 		{
 			return;
@@ -155,10 +161,70 @@ namespace ph
 	{
 	}
 
+	std::string Archive::FormatFilePath(const std::string & _filepath)
+	{
+		int nSec = 0;
+		std::string curSec;
+		std::string fpath;
+		const char * ptr = _filepath.c_str();
+		while (*ptr != 0)
+		{
+			if (*ptr == '\\' || *ptr == '/')
+			{
+				if (curSec.length() > 0)
+				{
+					if (curSec == ".") {}
+					else if (curSec == ".." && nSec >= 2)
+					{
+						int secleft = 2;
+						while (!fpath.empty() && secleft == 0)
+						{
+							if (fpath.back() == '\\' || fpath.back() == '/')
+							{
+								--secleft;
+							}
+							fpath.pop_back();
+						}
+					}
+					else
+					{
+						if( !fpath.empty() )
+							fpath.push_back('/');
+						fpath.append(curSec);
+						++nSec;
+					}
+					curSec.clear();
+				}
+			}
+			else
+			{
+				curSec.push_back( *ptr );
+				if (*ptr == ':')
+				{
+					--nSec;
+				}
+			}
+			++ptr;
+		}
+		if (curSec.length() > 0)
+		{
+			if (!fpath.empty())
+				fpath.push_back('/');
+			fpath.append(curSec);
+		}
+		return fpath;
+	}
+
 	IBlob * Archive::Open(const char * _fp)
 	{
-		std::string fullpath = m_root + _fp;
-		FILE* fp = fopen( fullpath.c_str(), "rb" );
+		std::string validPath = _fp;
+		FILE * fp = nullptr;
+		fp = fopen( _fp, "rb");
+		if (!fp)
+		{
+			validPath = m_root + validPath;
+			fp = fopen(validPath.c_str(), "rb");
+		}		
 		if (!fp)
 		{
 			return nullptr;
@@ -168,6 +234,7 @@ namespace ph
 		PhU32 end = ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 		Blob * blob = new Blob( end - set);
+		blob->m_filepath = validPath;
 		char * buffer = blob->GetBuffer();
 		long long ret  = fread(buffer, 1, blob->Size(), fp);
 		return blob;
@@ -183,6 +250,11 @@ namespace ph
 		}
 		fclose(fp);
 		return true;
+	}
+
+	const std::string& Archive::GetRoot() const
+	{
+		return m_root;
 	}
 
 	void Archive::Init(const char * _root)

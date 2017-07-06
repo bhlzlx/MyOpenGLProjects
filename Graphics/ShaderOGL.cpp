@@ -156,6 +156,24 @@ namespace ph
 		return nullptr;
 	}
 
+	UniformBufferObjectRef ShaderOGL::AllocUniformBufferObject(const char * _name, size_t _bindSlotID )
+	{
+		GLuint blockIndex = glGetUniformBlockIndex(this->m_prog, _name); __gl_check_error__;
+		GLint blockSize;
+		glGetActiveUniformBlockiv(m_prog, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+
+		glUniformBlockBinding(m_prog, blockIndex, _bindSlotID); __gl_check_error__;
+		UniformBufferObjectRef ubo = UniformBufferObjectRef( new UniformBufferObject() ); __gl_check_error__
+		glGenBuffers(1, &ubo->bufObj ); __gl_check_error__
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo->bufObj); __gl_check_error__
+		//设置UBO存储的数据（用来给Uniform Block中变量赋值）  
+		glBufferData(GL_UNIFORM_BUFFER, blockSize, nullptr , GL_DYNAMIC_DRAW); __gl_check_error__
+		ubo->bindSlotID = _bindSlotID;
+		ubo->blockIndex = blockIndex;
+		ubo->bufSize = blockSize;
+		return ubo;
+	}
+
 	void ShaderOGL::Release()
 	{
 		glDeleteProgram(m_prog);

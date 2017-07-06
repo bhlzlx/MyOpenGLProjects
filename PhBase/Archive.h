@@ -17,6 +17,7 @@ namespace ph
 		virtual char* 		GetCurr() = 0;
 		virtual char* 		GetBuffer() = 0;
 		virtual void 		Release() = 0;
+		virtual const char * Filepath() = 0;
 		virtual ~IBlob() {};
 	};
 
@@ -28,8 +29,10 @@ namespace ph
 		Archive();
 		IBlob * Open(const char * _fp);
 		bool Exist(const char * _fp);
+		const std::string& GetRoot() const;
 		void Init( const char * _root);
 		~Archive();
+		static std::string FormatFilePath(const std::string& _filepath);
 	};
 
 	Archive * GetDefArchive();

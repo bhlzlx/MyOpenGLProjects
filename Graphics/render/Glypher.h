@@ -240,13 +240,9 @@ namespace ph
 
 		Canvas(PhU16 _width, PhU16 _height)
 		{
-			texture = std::shared_ptr<TexOGL>(TexOGL::CreateTexEmpty( PIXEL_FORMAT_A8 , _width, _height), [](TexOGL* _ptr) {
+			texture = std::shared_ptr<TexOGL>(TexOGL::CreateTexAlpha8( _width, _height), [](TexOGL* _ptr) {
 			_ptr->Release();
-			});			
-			/*SamplerState ss;
-			ss.MagFilter = TEX_FILTER_POINT;
-			ss.MinFilter = TEX_FILTER_POINT;
-			texture->sampler.SetDesc(ss);*/
+			});
 			logicX = logicY = 0;
 			width = _width;
 			height = _height;
