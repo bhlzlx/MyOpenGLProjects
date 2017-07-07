@@ -60,6 +60,7 @@ void Application::Start(void* _hwnd)
 	render = ph::GUIRender::GetInstance(arch);
 	modelRender = new ph::Basic3DRender();
 	modelRender->Init(arch);
+	modelRender->SetLight(glm::vec4(0, 100, -100, 1.0), glm::vec4(1.0, 1.0, 1.0, 1.0));
 
 	model = ph::CreateModel3D("./Mickey_Mouse.obj");
 //model = ph::CreateModel3D("./low-poly-mill.obj");
@@ -84,7 +85,7 @@ void Application::OnResize( int _w, int _h )
 	ph::GUIRender::GUIViewport(_w, _h);
 
 	matProj = glm::perspectiveFov<float>(120, _w, _h, 0.1f, 500.0f);
-	matView = glm::lookAt(glm::vec3(0, 20, -20), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	matView = glm::lookAt(glm::vec3(0, 5, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	matModel = glm::mat4x4();
 
 }

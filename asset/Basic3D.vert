@@ -5,25 +5,45 @@ layout (location = 1) in vec3 norm;
 layout (location = 2) in vec2 coord;
 
 layout (std140) uniform RenderParam{
-	mat4 model;		// MVP矩阵
+	mat4 proj;		// MVP矩阵
 	mat4 view;
-	mat4 proj;
-	vec3 Lp;		// 点光源位置
-	vec3 Lc;		// 点光源颜色
-	vec3 Ka;		// 环境光掩码
-	vec3 Kd;		// 散射光掩码
-	vec3 Ks;		// 散射光掩码
+	mat4 model;		
+	vec4 Lp;		// 点光源位置
+	vec4 Lc;		// 点光源颜色
+	vec4 Ka;		// 环境光掩码
+	vec4 Kd;		// 散射光掩码
+	vec4 Ks;		// 镜面光掩码
 	float shiness;	// 高光系数
 };
 
-struct 
+struct FragmentIn
+{
+	vec4	Ld;			// 光源方向（这个可以插值）
+	vec2	coord;		// 纹理参数
+	vec4	norm;
+	vec4	ambient;
+	vec4	diffuse;
+	vec4	specular;
+	float	shiness;	// 固定值
+};
 
-out vec2 coordOut;
-out vec3 diffuse_color_out;
+out FragmentIn fragmentIn;
 
 void main()
 {
-    coordOut = coord;
-	diffuse_color_out = diffuse_color;
-    gl_Position = proj * view * model * vec4( pos.x, pos.y, pos.z, 1.0);
+    fragmentIn.coord = coord;
+	fragmentIn.shiness = shiness;
+	fragmentIn.norm = normalize( model * vec4(norm,0.0) ); // 变换后的法线
+	
+	vec4 modelPos = model * vec4( pos, 1.0);
+	
+	fragmentIn.Ld = normalize(  Lp - modelPos );
+	
+	float Kdiff = max( dot( fragmentIn.Ld, fragmentIn.norm ) , 0.0); // 散射光的强度
+
+	fragmentIn.diffuse = Kd * Kdiff;
+	fragmentIn.ambient = Ka;
+	fragmentIn.specular = Ks;
+	
+    gl_Position = proj * view * modelPos;
 }
