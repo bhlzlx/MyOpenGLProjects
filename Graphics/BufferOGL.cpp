@@ -3,79 +3,73 @@
 
 namespace ph
 {
-	StaticVB* StaticVB::New(const  void* _data, size_t _size)
+	std::shared_ptr<StaticVBO> StaticVBO::New(const  void* _data, size_t _size)
 	{
-		GLuint buffer;
-		glGenBuffers(1, &buffer);
+		StaticVBORef ref( new StaticVBO() );
+		glGenBuffers(1, &ref->buffer);
 		__gl_check_error__
-			glBindBuffer(GL_ARRAY_BUFFER, buffer);
+			glBindBuffer(GL_ARRAY_BUFFER, ref->buffer);
 		__gl_check_error__
 			glBufferData(GL_ARRAY_BUFFER, _size, _data, GL_STATIC_DRAW);
 		__gl_check_error__
-			StaticVB * vb = new StaticVB;
-		vb->buffer = buffer;
-		vb->size = _size;
-		return vb;
+		ref->size = _size;
+		return ref;
 	}
 
-	void StaticVB::Bind()
+	void StaticVBO::Bind()
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	}
 
-	void StaticVB::Release()
+	StaticVBO::~StaticVBO()
 	{
 		glDeleteBuffers(1, &buffer);
 		__gl_check_error__
 			buffer = 0;
 		size = 0;
-		delete this;
 	}
 
-	StaticIB* StaticIB::New(const  void * _data, size_t _size)
+	StaticIBORef StaticIBO::New(const  void * _data, size_t _size)
 	{
-		GLuint buffer;
-		glGenBuffers(1, &buffer);
+		StaticIBORef ref( new StaticIBO() );
+		glGenBuffers(1, &ref->buffer);
 		__gl_check_error__
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ref->buffer);
 		__gl_check_error__
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, _size, _data, GL_STATIC_DRAW);
 		__gl_check_error__
-			StaticIB * ib = new StaticIB;
-		ib->buffer = buffer;
-		ib->size = _size;
-		return ib;
+		ref->size = _size;
+		return ref;
 	}
 
-	void StaticIB::Bind()
+	void StaticIBO::Bind()
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
 	}
 
-	void StaticIB::Release()
+	StaticIBO::~StaticIBO()
 	{
 		glDeleteBuffers(1, &buffer);
 		__gl_check_error__
 			buffer = 0;
 		size = 0;
-		delete this;
 	}
 
-	VertexArray * VertexArray::New(IBindable * _vb, IBindable * _ib, VertexArray::Layout* _layout)
+	std::shared_ptr<VertexArray> VertexArray::New(IBindable * _vb, IBindable * _ib, VertexArray::Layout* _layout)
 	{
-		VertexArray * _va = new VertexArray;
-		glGenVertexArrays(1, &_va->va);	__gl_check_error__
-		_va->ib = _ib;
-		_va->vb = _vb;
+		VertexArrayRef ref( new VertexArray );
+		glGenVertexArrays(1, &ref->va);	__gl_check_error__
+		ref->ib = _ib;
+		ref->vb = _vb;
 		VertexArray::Layout * layout = _layout;
-		_va->layouts = _layout;
-		_va->nlayout = 0;
+		ref->layouts = _layout;
+		ref->nlayout = 0;
 		while (layout->size != 0)
 		{
-			++_va->nlayout;
+			++ref->nlayout;
 			++layout;
 		}
-		return _va;
+		return ref;
 	}
 
 	void VertexArray::Bind()
@@ -90,67 +84,70 @@ namespace ph
 		}
 	}
 
-	void VertexArray::Release()
+	VertexArray::~VertexArray()
 	{
 		glBindVertexArray(0);
 		glDeleteVertexArrays(1, &va);
-		delete this;
 	}
 
 
-
-	DynamicVBO::DynamicVBO(size_t _nItem, size_t _typeSize)
+	DynamicVBORef DynamicVBO::New( size_t _size )
 	{
-		typeSize = _typeSize;
-		glGenBuffers(1, &buffer); __gl_check_error__
-			glBindBuffer(GL_ARRAY_BUFFER, buffer); __gl_check_error__
-			glBufferData(GL_ARRAY_BUFFER, typeSize * _nItem, nullptr, GL_DYNAMIC_DRAW); __gl_check_error__
-			this->capacity = typeSize * _nItem;
-		this->size = 0;
+		DynamicVBORef ref(new DynamicVBO());
+		glGenBuffers(1, &ref->buffer); __gl_check_error__
+		glBindBuffer(GL_ARRAY_BUFFER, ref->buffer); __gl_check_error__
+		glBufferData(GL_ARRAY_BUFFER, _size, nullptr, GL_DYNAMIC_DRAW); __gl_check_error__
+		ref->size = _size;
+
+		return ref;
 	}
 
-	bool DynamicVBO::Write(size_t _index, const void* _data)
+	bool DynamicVBO::BufferData( const void * _data, size_t _offset, size_t _size)
 	{
-		if (size >= typeSize * (_index + 1))
+		if (size >= _offset + _size)
 		{
 			glBindBuffer(GL_ARRAY_BUFFER, buffer); __gl_check_error__
-				glBufferSubData(GL_ARRAY_BUFFER, typeSize * _index, typeSize, _data); __gl_check_error__
-				return true;
+			glBufferSubData(GL_ARRAY_BUFFER, _offset, _size, _data); __gl_check_error__
+			return true;
 		}
 		return false;
 	}
 
-	void DynamicVBO::PushBack(const void* _data)
+	bool DynamicVBO::Resize(size_t _size)
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, buffer);
-		if (capacity - size <= typeSize)
+		if (_size > size)
 		{
-			size_t newCapacity = capacity * 2;
+			// 创建新的buffer对象
 			GLuint newBuffer;
-
-			glBindBuffer(GL_COPY_READ_BUFFER, buffer); __gl_check_error__
 			glGenBuffers(1, &newBuffer); __gl_check_error__
+			// 设置新的对象为写入对象
 			glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer); __gl_check_error__
-			glBufferData(GL_COPY_WRITE_BUFFER, newCapacity, nullptr, GL_DYNAMIC_DRAW); __gl_check_error__
-
-			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, this->size); __gl_check_error__
+			glBindBuffer(GL_ARRAY_BUFFER, buffer);
+			// 设置buffer大小
+			glBufferData(GL_COPY_WRITE_BUFFER, _size, nullptr, GL_DYNAMIC_DRAW); __gl_check_error__
+			// 设置当前buffer为读取源
+			glBindBuffer(GL_COPY_READ_BUFFER, buffer); __gl_check_error__
+			// 复制数据
+			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size); __gl_check_error__
+			// 删除旧buffer
 			glDeleteBuffers(1, &this->buffer); __gl_check_error__
+			// 
 			this->buffer = newBuffer;
-			this->capacity = newCapacity;
+			this->size = _size;
+			return true;
 		}
-		glBindBuffer(GL_ARRAY_BUFFER, this->buffer);
-		glBufferSubData(GL_ARRAY_BUFFER, this->size, typeSize, _data); __gl_check_error__
-			size += typeSize;
+		return false;
+	}
+	// dtor
+
+	size_t DynamicVBO::Size()
+	{
+		return size;
 	}
 
-	size_t DynamicVBO::ItemCount()
+	inline DynamicVBO::~DynamicVBO()
 	{
-		return this->size / typeSize;
-	}
-
-	size_t DynamicVBO::ItemCapacity()
-	{
-		return this->capacity / typeSize;
+		glDeleteBuffers(1, &buffer);
 	}
 
 	void DynamicVBO::Bind()
@@ -158,9 +155,90 @@ namespace ph
 		glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	}
 
-	void DynamicVBO::Release()
+	std::shared_ptr<DynamicIBO> DynamicIBO::New(size_t _size)
+	{
+		std::shared_ptr< DynamicIBO > ref(new DynamicIBO());
+		glGenBuffers(1, &ref->buffer); __gl_check_error__;
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ref->buffer); __gl_check_error__;
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _size, nullptr, GL_STATIC_DRAW); __gl_check_error__;
+		ref->size = _size;
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		return ref;
+	}
+
+	void DynamicIBO::Bind()
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+	}
+
+	bool DynamicIBO::BufferData(const void * _data, size_t _offset, size_t _size)
+	{
+		if (_offset + _size <= this->size)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer); __gl_check_error__;
+			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, _offset, _size, _data); __gl_check_error__;
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); __gl_check_error__;
+			return true;
+		}
+		return false;
+	}
+
+	bool DynamicIBO::Resize(size_t _size)
+	{
+		if (_size > size)
+		{
+			// 创建新的buffer对象
+			GLuint newBuffer;
+			glGenBuffers(1, &newBuffer); __gl_check_error__;
+			// 设置新的对象为写入对象
+			glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer); __gl_check_error__;
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
+			// 设置buffer大小
+			glBufferData(GL_COPY_WRITE_BUFFER, _size, nullptr, GL_DYNAMIC_DRAW); __gl_check_error__;
+			// 设置当前buffer为读取源
+			glBindBuffer(GL_COPY_READ_BUFFER, buffer); __gl_check_error__;
+			// 复制数据
+			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size); __gl_check_error__;
+			// 删除旧buffer
+			glDeleteBuffers(1, &this->buffer); __gl_check_error__;
+			// 
+			this->buffer = newBuffer;
+			this->size = _size;
+			return true;
+		}
+		return false;
+	}
+
+	/*inline bool DynamicIBO::Resize(size_t _size)
+	{
+		if (_size > this->size)
+		{
+			GLuint newBuffer;
+			__gl_check_error__
+				glBindBuffer(GL_COPY_READ_BUFFER, buffer); __gl_check_error__
+				glGenBuffers(1, &newBuffer); __gl_check_error__
+				glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer); __gl_check_error__
+				glBufferData(GL_COPY_WRITE_BUFFER, _size, nullptr, GL_STATIC_DRAW); __gl_check_error__
+
+				glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, this->size); __gl_check_error__
+				glDeleteBuffers(1, &buffer); __gl_check_error__
+				this->buffer = newBuffer;
+			this->size = _size;
+		}
+		return true;
+	}*/
+
+	size_t DynamicIBO::Size()
+	{
+		return size;
+	}
+
+	inline DynamicIBO::~DynamicIBO()
 	{
 		glDeleteBuffers(1, &buffer);
+		buffer = 0;
+		size = 0;
 	}
+
 
 }

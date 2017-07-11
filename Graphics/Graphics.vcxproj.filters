@@ -81,6 +81,12 @@
     <ClInclude Include="render\Basic3DRender.h">
       <Filter>render</Filter>
     </ClInclude>
+    <ClInclude Include="RenderObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="render\UIWidget.cpp">
@@ -121,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="render\Basic3DRender.cpp">
       <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderObject.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneLoader.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

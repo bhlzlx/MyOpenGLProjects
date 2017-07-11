@@ -5,150 +5,94 @@
 
 namespace ph
 {
-
 	class IBindable
 	{
 	public:
-		virtual void Bind()
-		{
-
-		}
-		
-		virtual void Release()
-		{
-
-		}
-
-		~IBindable()
-		{
-
-		}
-	};
-
-	class IBufferOGL:public IBindable
-	{
-	public:
 		virtual void Bind() = 0;
-		virtual void Release() = 0;
-		virtual void BufferData(const  void * _data, PhSizeT _size) {
-			throw "bad invokition!";
-		}
-		virtual ~IBufferOGL() {
-		}
 	};
 
-	class StaticVB :public IBufferOGL
+	class IWritableBuffer
+	{
+	public:
+		virtual bool BufferData(const void * _data, size_t _offset, size_t _size) = 0;
+	};
+
+	class IMutableBuffer
+	{
+	public:
+		virtual bool AppendBuffer(const void * _data, size_t _size) = 0;
+	};
+
+
+	class StaticVBO : public IBindable
 	{
 	private:
 		GLuint      buffer;
 		PhSizeT     size;
 	public:
-		static StaticVB* New(const void * _data, PhSizeT _size);
+		static std::shared_ptr< StaticVBO > New(const void * _data, PhSizeT _size);
 		virtual void Bind();
-		virtual void Release();
+		~StaticVBO();
 	};
 
-	class StaticIB :public IBufferOGL
+	class StaticIBO : public IBindable
 	{
 	private:
 		GLuint      buffer;
 		PhSizeT     size;
 	public:
-		static StaticIB* New(const void * _data, PhSizeT _size);
+		static std::shared_ptr< StaticIBO > New(const void * _data, PhSizeT _size);
 		void Bind();
-		void Release();
+		~StaticIBO();
 	};
 
-	class dynamic_ibo : public IBindable
+	typedef std::shared_ptr< StaticIBO > StaticIBORef;
+	typedef std::shared_ptr< StaticVBO > StaticVBORef;
+
+	class DynamicVBO :public IBindable, IWritableBuffer
+	{
+	private:
+		GLuint		buffer;
+		size_t		size;
+	public:
+		static std::shared_ptr< DynamicVBO > New( size_t _size );
+		// IBinable
+		void Bind();
+		// IWritable
+		bool BufferData( const void * _data, size_t _offset, size_t _size);
+		// IMutableBuffer
+		bool Resize( size_t _size );
+		// dtor
+		size_t Size();
+		~DynamicVBO();
+	};
+
+	typedef std::shared_ptr< DynamicVBO > DynamicVBORef;
+
+	class DynamicIBO:public IBindable, IWritableBuffer
 	{
 	private:
 		GLuint buffer;
 		size_t size;
 	public:
-		dynamic_ibo(size_t _size)
-		{
-			glGenBuffers(1, &buffer); __gl_check_error__
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer); __gl_check_error__
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, _size, nullptr, GL_STATIC_DRAW); __gl_check_error__
-				size = _size;
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		}
-		~dynamic_ibo()
-		{
-			glDeleteBuffers(1, &buffer);
-		}
-
-		bool Write(size_t _offset, size_t _size, PhU32* _data)
-		{
-			if (_offset + _size  <= this->size)
-			{
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer); __gl_check_error__
-					glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, _offset, _size, _data); __gl_check_error__
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); __gl_check_error__
-					return true;
-			}
-			return false;
-		}
-
-		bool Resize(size_t _size)
-		{
-			if (_size > this->size)
-			{
-				GLuint newBuffer;
-				__gl_check_error__
-				glBindBuffer(GL_COPY_READ_BUFFER, buffer); __gl_check_error__
-				glGenBuffers(1, &newBuffer); __gl_check_error__
-				glBindBuffer(GL_COPY_WRITE_BUFFER, newBuffer); __gl_check_error__
-				glBufferData(GL_COPY_WRITE_BUFFER, _size, nullptr, GL_STATIC_DRAW); __gl_check_error__
-
-				glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, this->size); __gl_check_error__
-				glDeleteBuffers(1, &buffer); __gl_check_error__
-				this->buffer = newBuffer;
-				this->size = _size;
-			}
-			return true;
-		}
-
-		PhU32 ItemSize()
-		{
-			return size / sizeof(PhU32);
-		}
-
-		void Bind()
-		{
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
-		}
-
-		void Release()
-		{
-			glDeleteBuffers(1, &buffer);
-		}
-	};
-
-	class DynamicVBO:public IBindable
-	{
-	private:
-		size_t		typeSize;
-		GLuint		buffer;
-		size_t		size;
-		size_t		capacity;
-	public:
-		DynamicVBO(size_t _nItem, size_t _typeSize );
-		~DynamicVBO()
-		{
-			glDeleteBuffers(1, &buffer);
-		}
-		bool Write(size_t _index, const void* _data);
-		void PushBack(const void *_data);
-		size_t ItemCount();
-		size_t ItemCapacity();
+		static std::shared_ptr< DynamicIBO > New(size_t _size);
+		// IBinable
 		void Bind();
-		void Release();
+		// IWritable
+		bool BufferData(const void * _data, size_t _offset, size_t _size);
+		//
+		size_t Size();
+		bool Resize( size_t _size );
+
+		~DynamicIBO();
 	};
 
-	class VertexArray
+	typedef std::shared_ptr< DynamicIBO > DynamicIBORef;
+
+	class VertexArray:public IBindable
 	{
 	public:
+		friend class std::shared_ptr<VertexArray>;
 		struct Layout
 		{
 			GLuint      index;
@@ -157,16 +101,18 @@ namespace ph
 			GLsizei     stride;
 			GLvoid*     offset;
 		};
-	private:
+	public:
 		GLuint          va;
 		IBindable *     vb;
 		IBindable *     ib;
 		Layout *        layouts;
 		unsigned short  nlayout;
 	public:
-		static VertexArray * New(IBindable * _vb, IBindable * _ib, VertexArray::Layout* _layout);
+		static std::shared_ptr<VertexArray> New(IBindable * _vb, IBindable * _ib, VertexArray::Layout* _layout);
 		void Bind();
-		void Release();
+		~VertexArray();
 	};
+
+	typedef std::shared_ptr<VertexArray> VertexArrayRef;
 
 }

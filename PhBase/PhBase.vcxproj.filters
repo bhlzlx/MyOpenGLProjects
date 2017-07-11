@@ -25,6 +25,9 @@
     <Filter Include="3RD\log4z">
       <UniqueIdentifier>{0fd41d7b-7976-4d64-827e-efd55c73ff4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3RD\json">
+      <UniqueIdentifier>{bf32f417-c0e6-4eba-ac6a-487887d1ef77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -94,6 +97,15 @@
       <Filter>3RD\log4z</Filter>
     </ClInclude>
     <ClInclude Include="QTree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="3RD\cjson\cJSON_Utils.h">
+      <Filter>3RD\json</Filter>
+    </ClInclude>
+    <ClInclude Include="3RD\cjson\cJSON.h">
+      <Filter>3RD\json</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -195,6 +207,15 @@
       <Filter>3RD\log4z</Filter>
     </ClCompile>
     <ClCompile Include="QTree.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="3RD\cjson\cJSON.c">
+      <Filter>3RD\json</Filter>
+    </ClCompile>
+    <ClCompile Include="3RD\cjson\cJSON_Utils.c">
+      <Filter>3RD\json</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -27,6 +27,7 @@ Texture gTex;
 glm::mat4x4 matProj;
 glm::mat4x4 matView;
 glm::mat4x4 matModel;
+glm::mat4x4 matModelScale;
 
 ph::Model3D model;
 
@@ -60,10 +61,18 @@ void Application::Start(void* _hwnd)
 	render = ph::GUIRender::GetInstance(arch);
 	modelRender = new ph::Basic3DRender();
 	modelRender->Init(arch);
-	modelRender->SetLight(glm::vec4(0, 100, -100, 1.0), glm::vec4(1.0, 1.0, 1.0, 1.0));
+	modelRender->SetLight(glm::vec4(0, 0, -100, 1.0), glm::vec4(1.0, 1.0, 1.0, 1.0));
 
 	model = ph::CreateModel3D("./Mickey_Mouse.obj");
-//model = ph::CreateModel3D("./low-poly-mill.obj");
+	//model = ph::CreateModel3D("./low-poly-mill.obj");
+
+	glm::vec3 modelCenter((model.aabb.min.x + model.aabb.max.x) / 2, (model.aabb.min.y + model.aabb.max.y) / 2, (model.aabb.min.z + model.aabb.max.z) / 2);
+	float blm = (model.aabb.max.x - model.aabb.min.x) > (model.aabb.max.y - model.aabb.min.y) ? (model.aabb.max.x - model.aabb.min.x) : (model.aabb.max.y - model.aabb.min.y);
+	blm = blm > (model.aabb.max.z - model.aabb.min.z) ? blm : (model.aabb.max.z - model.aabb.min.z);
+
+	matModelScale =  glm::translate(glm::scale<float>(glm::mat4x4(), glm::vec3(2.0f / blm, 2.0f / blm, 2.0f / blm)), -modelCenter) ;
+
+	//matModelScale = model.
 	gTex = ph::TexPool::Get("system/texture/axe.png");
 }
 
@@ -85,9 +94,8 @@ void Application::OnResize( int _w, int _h )
 	ph::GUIRender::GUIViewport(_w, _h);
 
 	matProj = glm::perspectiveFov<float>(120, _w, _h, 0.1f, 500.0f);
-	matView = glm::lookAt(glm::vec3(0, 5, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-	matModel = glm::mat4x4();
-
+	matView = glm::lookAt(glm::vec3(0, 5, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	//matModel = glm::mat4x4();
 }
 
 void Application::End()
@@ -103,7 +111,7 @@ void Application::OnRender(unsigned long _tick)
 {
 	static float angle = 0.0f;
 	angle += 0.05f;
-	matModel = glm::rotate( glm::mat4x4(), angle, glm::vec3(0, 1, 0));
+	matModel = glm::rotate( matModelScale, angle, glm::vec3(0, 1, 0));
 	view->Begin(); __gl_check_error__
 	render->Begin();
 	render->Draw(&tankWidget);
@@ -172,6 +180,7 @@ void Application::OnKeyEvent( unsigned char _key, eKeyEvent _event )
 		text.color = 0xff0000ff;
 		text.charGap = 1.0f;
 		tankWidget.Build(text, 1);
+
 		tankWidget.End();
 	}
 }

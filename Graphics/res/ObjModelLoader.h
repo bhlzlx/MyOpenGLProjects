@@ -22,6 +22,12 @@ namespace ph
 		}
 	};
 
+	struct AABB
+	{
+		vec3 min;
+		vec3 max;
+	};
+
 	struct Material
 	{
 		char			name[32];
@@ -44,9 +50,10 @@ namespace ph
 
 	struct ServerSideMesh
 	{
-		IBindable*		vbo;
-		IBindable*		ibo;
-		VertexArray*	vao;
+		StaticVBORef	vbo;
+		StaticIBORef	ibo;
+		VertexArrayRef	vao;
+		AABB			aabb;
 		size_t			nElement;
 		size_t			material;
 	};
@@ -59,6 +66,7 @@ namespace ph
 
 	struct Model3D
 	{
+		AABB				aabb;
 		MeshVector			vecMesh;
 		MaterialVector		vecMaterial;
 	};
@@ -66,8 +74,8 @@ namespace ph
 	inline ServerSideMesh CreateServerSideMesh(ClientSideMesh& _cm, MaterialVector& _materialVec )
 	{
 		ServerSideMesh mesh;
-		StaticVB * vbo = StaticVB::New(_cm.vertices.data(), _cm.vertices.size() * sizeof(ObjVertData));
-		StaticIB * ibo = StaticIB::New(_cm.indices.data(), _cm.indices.size() * sizeof(unsigned int));
+		StaticVBORef vbo = StaticVBO::New(_cm.vertices.data(), _cm.vertices.size() * sizeof(ObjVertData));
+		StaticIBORef ibo = StaticIBO::New(_cm.indices.data(), _cm.indices.size() * sizeof(unsigned int));
 		static VertexArray::Layout layout[] = 
 		{
 			{0, 3, GL_FLOAT, sizeof(ObjVertData), 0 },
@@ -75,7 +83,7 @@ namespace ph
 			{2, 2, GL_FLOAT, sizeof(ObjVertData), (GLvoid*) (sizeof(float) * 6) },
 			{0}
 		};
-		VertexArray * vao = VertexArray::New(vbo, ibo, &layout[0]);
+		VertexArrayRef vao = VertexArray::New( vbo.get(), ibo.get(), &layout[0]);
 		mesh.ibo = ibo;
 		mesh.vbo = vbo;
 		mesh.vao = vao;
@@ -89,6 +97,26 @@ namespace ph
 				break;
 			}
 		}
+
+		if (_cm.vertices.size())
+		{
+			mesh.aabb.min.x = mesh.aabb.max.x = _cm.vertices[0].pos.x;
+			mesh.aabb.min.y = mesh.aabb.max.y = _cm.vertices[0].pos.y;
+			mesh.aabb.min.z = mesh.aabb.max.z = _cm.vertices[0].pos.z;
+			vec3& min = mesh.aabb.min;
+			vec3& max = mesh.aabb.max;
+			for (auto&vert : _cm.vertices)
+			{
+				min.x = min.x < vert.pos.x ? min.x : vert.pos.x;
+				min.y = min.y < vert.pos.y ? min.y : vert.pos.y;
+				min.z = min.z < vert.pos.z ? min.z : vert.pos.z;
+
+				max.x = max.x > vert.pos.x ? max.x : vert.pos.x;
+				max.y = max.y > vert.pos.y ? max.y : vert.pos.y;
+				max.z = max.z > vert.pos.z ? max.z : vert.pos.z;
+			}
+		}
+		
 		return mesh;
 	}
 
@@ -100,6 +128,27 @@ namespace ph
 			m.vecMesh.push_back(CreateServerSideMesh(_cm, _mv));
 		}
 		m.vecMaterial = _mv;
+
+		vec3& min = m.aabb.min;
+		vec3& max = m.aabb.max;
+
+		if (m.vecMesh.size() > 0)
+		{
+			m.aabb = m.vecMesh[0].aabb;
+			for (auto& subMesh : m.vecMesh )
+			{
+				auto& subAabbMin = subMesh.aabb.min;
+				auto& subAabbMax = subMesh.aabb.max;
+				min.x = min.x < subAabbMin.x ? min.x : subAabbMin.x;
+				min.y = min.y < subAabbMin.y ? min.y : subAabbMin.y;
+				min.z = min.z < subAabbMin.z ? min.z : subAabbMin.z;
+
+				max.x = max.x > subAabbMax.x ? max.x : subAabbMax.x;
+				max.y = max.y > subAabbMax.y ? max.y : subAabbMax.y;
+				max.z = max.z > subAabbMax.z ? max.z : subAabbMax.z;
+			}
+		}
+
 		return m;
 	}
 
@@ -115,6 +164,17 @@ namespace ph
 			return CreateModel3D(cmv, mv);
 		}
 		return Model3D();
+	}
+
+	enum eModelPredef
+	{
+		eModelCube,
+		eModelBall,
+	};
+
+	inline Model3D CreateModel3D(int _pre)
+	{
+		
 	}
 
 	inline bool LoadObjMtl(const char * _mtl, std::vector<Material>& _material )

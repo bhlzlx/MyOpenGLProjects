@@ -26,9 +26,9 @@ namespace ph
 	void UIVertexArray::Init(size_t _nItem)
 	{
 		_nItem = (_nItem >> 2) << 2; // 4的倍数
-		dynamicVBO = new DynamicVBO(_nItem, sizeof(UIRectVert));
-		dynamicIBO = new dynamic_ibo(_nItem * 6 * sizeof(PhU32));
-		vertexArray = VertexArray::New(dynamicVBO, dynamicIBO, &layouts[0]);
+		dynamicVBO = DynamicVBO::New( _nItem * sizeof(UIRectVert) );		// nItem个面
+		dynamicIBO = DynamicIBO::New( _nItem * 6 * sizeof(PhU32) );			// 一个面6个索引
+		vertexArray = VertexArray::New( dynamicVBO.get() , dynamicIBO.get() , &layouts[0]);
 		std::vector<PhU32> Indices;
 		for (size_t i = 0; i < _nItem; ++i)
 		{
@@ -39,7 +39,12 @@ namespace ph
 			Indices.push_back(i * 4 + 1);
 			Indices.push_back(i * 4 + 3);
 		}
-		dynamicIBO->Write(0, _nItem * 6 * sizeof(PhU32), Indices.data());
+		dynamicIBO->BufferData(Indices.data(), 0, _nItem * 6 * sizeof(PhU32));
+		//
+		for (size_t i = 0; i < _nItem; ++i)
+		{
+			stkFree.push(i);
+		}
 	}
 	void UIVertexArray::Bind()
 	{
@@ -53,29 +58,36 @@ namespace ph
 		if (!stkFree.empty())
 		{
 			PhU32 ret = stkFree.top();
-			dynamicVBO->Write(ret, &_rect);
+			dynamicVBO->BufferData(&_rect, ret * sizeof(_rect), sizeof(_rect));
 			stkFree.pop();
 			return ret;
 		}
-		size_t capacity = dynamicVBO->ItemCapacity();
-		dynamicVBO->PushBack(&_rect);
-		size_t new_capacity = dynamicVBO->ItemCapacity();
-		if (new_capacity > capacity)
+		// 空闲栈里的不够用了,Buffer*2
+		//
+		std::vector<PhU32> Indices;
+		
+		size_t nFace = dynamicVBO->Size() / sizeof(UIRectVert);
+
+		for (size_t i = nFace; i < nFace * 2; ++i)
 		{
-			dynamicIBO->Resize(new_capacity * 6 * sizeof(PhU32));
-			std::vector<PhU32> Indices;
-			for (size_t i = capacity; i < new_capacity; ++i)
-			{
-				Indices.push_back(i * 4 + 0);
-				Indices.push_back(i * 4 + 3);
-				Indices.push_back(i * 4 + 2);
-				Indices.push_back(i * 4 + 0);
-				Indices.push_back(i * 4 + 1);
-				Indices.push_back(i * 4 + 3);
-			}
-			dynamicIBO->Write(capacity * 6 * sizeof(PhU32), (new_capacity - capacity) * 6 * sizeof(PhU32), Indices.data());
+			Indices.push_back(i * 4 + 0);
+			Indices.push_back(i * 4 + 3);
+			Indices.push_back(i * 4 + 2);
+			Indices.push_back(i * 4 + 0);
+			Indices.push_back(i * 4 + 1);
+			Indices.push_back(i * 4 + 3);
+			stkFree.push(i);
 		}
-		return dynamicVBO->ItemCount() - 1;
+
+		dynamicVBO->Resize(dynamicVBO->Size() * 2);
+		dynamicIBO->Resize(dynamicIBO->Size() * 2);
+
+		dynamicIBO->BufferData(Indices.data(), dynamicIBO->Size() / 2, Indices.size() * sizeof(unsigned int));
+
+		PhU32 ret = stkFree.top();
+		stkFree.pop();
+
+		return ret;
 	}
 
 	void UIVertexArray::FreeUIRect(PhU32 _id)
@@ -85,7 +97,6 @@ namespace ph
 
 	void UIVertexArray::Release()
 	{
-		vertexArray->Release();
 		delete this;
 	}
 

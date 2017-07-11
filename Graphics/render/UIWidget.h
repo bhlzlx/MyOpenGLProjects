@@ -79,9 +79,9 @@ namespace ph
 	struct UIVertexArray
 	{
 	private:
-		DynamicVBO*								dynamicVBO;
-		dynamic_ibo*							dynamicIBO;
-		VertexArray*							vertexArray;
+		DynamicVBORef								dynamicVBO;
+		DynamicIBORef								dynamicIBO;
+		VertexArrayRef								vertexArray;
 
 		std::stack<PhU32> stkFree;
 	public:

@@ -135,6 +135,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="3RD\cjson\cJSON.h" />
+    <ClInclude Include="3RD\cjson\cJSON_Utils.h" />
     <ClInclude Include="3RD\libpng\png.h" />
     <ClInclude Include="3RD\libpng\pngconf.h" />
     <ClInclude Include="3RD\libpng\pngdebug.h" />
@@ -155,10 +157,13 @@
     <ClInclude Include="3RD\zlib\zlib.h" />
     <ClInclude Include="3RD\zlib\zutil.h" />
     <ClInclude Include="Archive.h" />
+    <ClInclude Include="Node.h" />
     <ClInclude Include="PhBase.h" />
     <ClInclude Include="QTree.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="3RD\cjson\cJSON.c" />
+    <ClCompile Include="3RD\cjson\cJSON_Utils.c" />
     <ClCompile Include="3RD\libpng\png.c" />
     <ClCompile Include="3RD\libpng\pngerror.c" />
     <ClCompile Include="3RD\libpng\pngget.c" />
@@ -191,6 +196,7 @@
     <ClCompile Include="3RD\zlib\uncompr.c" />
     <ClCompile Include="3RD\zlib\zutil.c" />
     <ClCompile Include="Archive.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="QTree.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
