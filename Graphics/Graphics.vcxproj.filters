@@ -84,8 +84,14 @@
     <ClInclude Include="RenderObject.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="SceneLoader.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="render\Model3D.h">
+      <Filter>render</Filter>
+    </ClInclude>
+    <ClInclude Include="res\SceneLoader.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="render\GridRender.h">
+      <Filter>render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -131,8 +137,14 @@
     <ClCompile Include="RenderObject.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SceneLoader.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="render\Model3D.cpp">
+      <Filter>render</Filter>
+    </ClCompile>
+    <ClCompile Include="res\SceneLoader.cpp">
+      <Filter>res</Filter>
+    </ClCompile>
+    <ClCompile Include="render\GridRender.cpp">
+      <Filter>render</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

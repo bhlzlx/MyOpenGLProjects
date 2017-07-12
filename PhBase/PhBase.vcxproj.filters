@@ -105,7 +105,7 @@
     <ClInclude Include="3RD\cjson\cJSON.h">
       <Filter>3RD\json</Filter>
     </ClInclude>
-    <ClInclude Include="Node.h">
+    <ClInclude Include="PhCamera.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -215,7 +215,7 @@
     <ClCompile Include="3RD\cjson\cJSON_Utils.c">
       <Filter>3RD\json</Filter>
     </ClCompile>
-    <ClCompile Include="Node.cpp">
+    <ClCompile Include="PhCamera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

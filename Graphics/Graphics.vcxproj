@@ -148,11 +148,13 @@
     <ClInclude Include="RenderStateGL.h" />
     <ClInclude Include="render\Basic3DRender.h" />
     <ClInclude Include="render\Glypher.h" />
+    <ClInclude Include="render\GridRender.h" />
     <ClInclude Include="render\GUIRender.h" />
+    <ClInclude Include="render\Model3D.h" />
     <ClInclude Include="render\UIWidget.h" />
     <ClInclude Include="res\ObjModelLoader.h" />
+    <ClInclude Include="res\SceneLoader.h" />
     <ClInclude Include="res\TexPool.h" />
-    <ClInclude Include="SceneLoader.h" />
     <ClInclude Include="ShaderOGL.h" />
     <ClInclude Include="TexOGL.h" />
   </ItemGroup>
@@ -165,11 +167,13 @@
     <ClCompile Include="RenderStateGL.cpp" />
     <ClCompile Include="render\Basic3DRender.cpp" />
     <ClCompile Include="render\Glypher.cpp" />
+    <ClCompile Include="render\GridRender.cpp" />
     <ClCompile Include="render\GUIRender.cpp" />
+    <ClCompile Include="render\Model3D.cpp" />
     <ClCompile Include="render\UIWidget.cpp" />
     <ClCompile Include="res\ObjModelLoader.cpp" />
+    <ClCompile Include="res\SceneLoader.cpp" />
     <ClCompile Include="res\TexPool.cpp" />
-    <ClCompile Include="SceneLoader.cpp" />
     <ClCompile Include="ShaderOGL.cpp" />
     <ClCompile Include="TexOGL.cpp" />
   </ItemGroup>

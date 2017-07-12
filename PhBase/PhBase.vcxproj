@@ -157,8 +157,8 @@
     <ClInclude Include="3RD\zlib\zlib.h" />
     <ClInclude Include="3RD\zlib\zutil.h" />
     <ClInclude Include="Archive.h" />
-    <ClInclude Include="Node.h" />
     <ClInclude Include="PhBase.h" />
+    <ClInclude Include="PhCamera.h" />
     <ClInclude Include="QTree.h" />
   </ItemGroup>
   <ItemGroup>
@@ -196,7 +196,7 @@
     <ClCompile Include="3RD\zlib\uncompr.c" />
     <ClCompile Include="3RD\zlib\zutil.c" />
     <ClCompile Include="Archive.cpp" />
-    <ClCompile Include="Node.cpp" />
+    <ClCompile Include="PhCamera.cpp" />
     <ClCompile Include="QTree.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

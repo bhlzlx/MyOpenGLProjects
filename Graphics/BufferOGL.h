@@ -2,6 +2,7 @@
 #include <gl/gl3w.h>
 #include <gl/gl.h>
 #include <PhBase/PhBase.h>
+#include <assert.h>
 
 namespace ph
 {
@@ -114,5 +115,39 @@ namespace ph
 	};
 
 	typedef std::shared_ptr<VertexArray> VertexArrayRef;
+
+	// Uniform Buffer Object  | UBO
+
+	struct UniformBufferObject
+	{
+		GLuint blockIndex;
+		GLuint bindSlotID;
+		GLuint bufObj;
+		GLuint bufSize;
+
+		void Bind()
+		{
+			glBindBufferBase(GL_UNIFORM_BUFFER, bindSlotID, bufObj);
+		}
+
+		void WriteData(const void * _data, size_t _offset, size_t _size)
+		{
+			assert(_offset + _size <= bufSize);
+			glBindBuffer(GL_UNIFORM_BUFFER, bufObj);
+			glBufferSubData(GL_UNIFORM_BUFFER, _offset, _size, _data);
+		}
+
+		UniformBufferObject()
+		{
+			blockIndex = bindSlotID = bufObj = bufSize = 0;
+		}
+
+		~UniformBufferObject()
+		{
+			glDeleteBuffers(1, &bufObj);
+		}
+	};
+
+	typedef std::shared_ptr< UniformBufferObject > UniformBufferObjectRef;
 
 }

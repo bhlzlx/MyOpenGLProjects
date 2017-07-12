@@ -28,6 +28,7 @@ namespace ph
 
 		glm::vec4				lightPos;			// 单光源位置
 		glm::vec4				lightColor;			// 单光源颜色
+
 	public:
 
 		bool Init(Archive * _arch)
@@ -64,6 +65,7 @@ namespace ph
 			return true;
 		}
 
+
 		void SetLight(const glm::vec4& _pos, const glm::vec4& _color)
 		{
 			lightPos = _pos;
@@ -91,25 +93,32 @@ namespace ph
 			return true;
 		}
 
-		void Draw(const glm::mat4x4& _matModel, const ph::Model3D& _theMesh )
+		void Draw(const glm::mat4x4& _matModel, const ph::BasicModelRef _model, eRenderMode _mode = ph::eRenderModeFill)
 		{
 			transUBO->WriteData(&_matModel, sizeof(glm::mat4x4) * 2, sizeof(glm::mat4x4));
-			for (auto & mesh : _theMesh.vecMesh)
+			for (auto & mesh : _model->meshes)
 			{
 				mesh.vao->Bind();
-				this->diffuseTexSlot->BindTexture( _theMesh.vecMaterial[mesh.material].texDiffuse.get() );
-				this->specTexSlot->BindTexture(_theMesh.vecMaterial[mesh.material].texHighlight.get());
-				this->ambientTexSlot->BindTexture(_theMesh.vecMaterial[mesh.material].texAmbient.get());
+				this->diffuseTexSlot->BindTexture(_model->materials[mesh.material].texDiffuse.get() );
+				this->specTexSlot->BindTexture(_model->materials[mesh.material].texHighlight.get());
+				this->ambientTexSlot->BindTexture(_model->materials[mesh.material].texAmbient.get());
 				struct {
 					glm::vec4 Ka, Kd, Ks;
 					float shiness;
 				} c ;
-				memcpy(&c.Ka, &_theMesh.vecMaterial[mesh.material].ambient, sizeof(glm::vec4));
-				memcpy(&c.Kd, &_theMesh.vecMaterial[mesh.material].diffuse, sizeof(glm::vec4));
-				memcpy(&c.Ks, &_theMesh.vecMaterial[mesh.material].specular, sizeof(glm::vec4));
-				c.shiness = _theMesh.vecMaterial[mesh.material].shiness;
+				memcpy(&c.Ka, &_model->materials[mesh.material].ambient, sizeof(glm::vec4));
+				memcpy(&c.Kd, &_model->materials[mesh.material].diffuse, sizeof(glm::vec4));
+				memcpy(&c.Ks, &_model->materials[mesh.material].specular, sizeof(glm::vec4));
+				c.shiness = _model->materials[mesh.material].shiness;
 				transUBO->WriteData(&c, sizeof(glm::mat4x4) * 3 + sizeof(glm::vec4) * 2, sizeof(c));
-				glDrawElements(GL_TRIANGLES, mesh.nElement, GL_UNSIGNED_INT, 0 );
+
+				GLuint modes[] = {
+					GL_POINT,
+					GL_FILL,
+					GL_LINE,
+				};
+				glPolygonMode(GL_FRONT_AND_BACK, modes[_mode]);
+				glDrawElements( GL_TRIANGLES, mesh.nElement, GL_UNSIGNED_INT, 0 );
 			}
 		}
 

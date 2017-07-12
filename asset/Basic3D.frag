@@ -21,7 +21,7 @@ out vec4 FragColor;
 
 void main()
 {
-	vec4 Color = texture2D( ambient_texture, fragmentIn.coord.st ) * fragmentIn.ambient * 0.1;
+	vec4 Color = texture2D( ambient_texture, fragmentIn.coord.st ) * fragmentIn.ambient;
 	Color += texture2D( diffuse_texture, fragmentIn.coord.st ) * fragmentIn.diffuse;
 	float Kspec = max( dot(fragmentIn.Ld, fragmentIn.norm), 0.0 );
 	

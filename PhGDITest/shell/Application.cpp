@@ -1,6 +1,7 @@
 #include "Application.h"
 #include <assert.h>
 #include <PhBase/Archive.h>
+#include <PhBase/PhCamera.h>
 #include <windows.h>
 #include <gl/gl3w.h>
 #include <gl/GL.h>
@@ -11,6 +12,7 @@
 #include <render/Glypher.h>
 #include <res/ObjModelLoader.h>
 #include <render/Basic3DRender.h>
+#include <render/GridRender.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 typedef ph::UIWidget Widget;
@@ -18,18 +20,22 @@ typedef ph::GUIRender Render;
 typedef ph::Basic3DRender ModelRender;
 typedef ph::GDIRenderRectExt RRC;
 typedef ph::TexOGLRef Texture;
+typedef ph::GridRender GridRender;
 
 Widget  tankWidget;
 Render* render;
 ModelRender * modelRender;
+GridRender * gridRender;
 Texture gTex;
+
+ph::PhCamera	camera;
 
 glm::mat4x4 matProj;
 glm::mat4x4 matView;
 glm::mat4x4 matModel;
 glm::mat4x4 matModelScale;
 
-ph::Model3D model;
+ph::BasicModelRef model;
 
 Application::Application()
 {    
@@ -61,19 +67,28 @@ void Application::Start(void* _hwnd)
 	render = ph::GUIRender::GetInstance(arch);
 	modelRender = new ph::Basic3DRender();
 	modelRender->Init(arch);
-	modelRender->SetLight(glm::vec4(0, 0, -100, 1.0), glm::vec4(1.0, 1.0, 1.0, 1.0));
+	modelRender->SetLight(glm::vec4(100, 100, -100, 1.0), glm::vec4(1.0, 1.0, 1.0, 1.0));
 
-	model = ph::CreateModel3D("./Mickey_Mouse.obj");
-	//model = ph::CreateModel3D("./low-poly-mill.obj");
+	gridRender = new ph::GridRender();
+	gridRender->Init(arch, 0.5, 30);
+	
+	
+	//model = ph::CreateModel3D("./Teapot.obj");
+	//model = ph::CreateModel3D("./Low-Poly-Racing-Car.obj");
+	//model = ph::CreateModel3D("./Mickey_Mouse.obj");
+	model = ph::CreateModel3D("./low-poly-mill.obj");
+	ph::AABB& aabb = model->aabb;
 
-	glm::vec3 modelCenter((model.aabb.min.x + model.aabb.max.x) / 2, (model.aabb.min.y + model.aabb.max.y) / 2, (model.aabb.min.z + model.aabb.max.z) / 2);
-	float blm = (model.aabb.max.x - model.aabb.min.x) > (model.aabb.max.y - model.aabb.min.y) ? (model.aabb.max.x - model.aabb.min.x) : (model.aabb.max.y - model.aabb.min.y);
-	blm = blm > (model.aabb.max.z - model.aabb.min.z) ? blm : (model.aabb.max.z - model.aabb.min.z);
+	glm::vec3 modelCenter((aabb.min.x + aabb.max.x) / 2, (aabb.min.y + aabb.max.y) / 2, (aabb.min.z + aabb.max.z) / 2);
+	float blm = (aabb.max.x - aabb.min.x) > (aabb.max.y - aabb.min.y) ? (aabb.max.x - aabb.min.x) : (aabb.max.y - aabb.min.y);
+	blm = blm > (aabb.max.z - aabb.min.z) ? blm : (aabb.max.z - aabb.min.z);
 
 	matModelScale =  glm::translate(glm::scale<float>(glm::mat4x4(), glm::vec3(2.0f / blm, 2.0f / blm, 2.0f / blm)), -modelCenter) ;
 
 	//matModelScale = model.
 	gTex = ph::TexPool::Get("system/texture/axe.png");
+	camera.SetMatView(glm::vec3(0, 5, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	
 }
 
 void Application::OnResize( int _w, int _h )
@@ -93,8 +108,10 @@ void Application::OnResize( int _w, int _h )
 	view->Resize(_w, _h);
 	ph::GUIRender::GUIViewport(_w, _h);
 
-	matProj = glm::perspectiveFov<float>(120, _w, _h, 0.1f, 500.0f);
-	matView = glm::lookAt(glm::vec3(0, 5, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+//	matProj = glm::perspectiveFov<float>(120, _w, _h, 0.1f, 500.0f);
+//	matView = glm::lookAt(glm::vec3(0, 5, -5), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+
+	camera.Perspective(120, float(_w)/float(_h), 0.1f, 500.0f);
 	//matModel = glm::mat4x4();
 }
 
@@ -109,79 +126,75 @@ void Application::End()
 
 void Application::OnRender(unsigned long _tick)
 {
+	camera.Tick();
+
+	matProj = camera.GetProjMatrix();
+	matView = camera.GetViewMatrix();
+
 	static float angle = 0.0f;
 	angle += 0.05f;
 	matModel = glm::rotate( matModelScale, angle, glm::vec3(0, 1, 0));
-	view->Begin(); __gl_check_error__
+	view->Begin(); __gl_check_error__;
+	gridRender->Begin(matView, matProj);
+	gridRender->Draw();
 	render->Begin();
 	render->Draw(&tankWidget);
 	modelRender->Begin(matView, matProj);
-	modelRender->Draw(matModel, model);
+	modelRender->Draw(matModel, model, ph::eRenderModeFill);
 	modelRender->End();
     view->End();
 }
 
 void Application::OnKeyEvent( unsigned char _key, eKeyEvent _event )
 {
-	ph::UIWidget::DefScissor(0, 2048, 0, 2048);
 	if( _event == eKeyDown )
 	{
-		RRC rrc;
-		rrc.MtcXMin = 0.0f; rrc.MtcXMax = 1.0f; rrc.MtcYMin = 0.0f; rrc.MtcYMax = 1.0f;
-		tankWidget.Begin();
-		rrc.Color = 0xffffffff; rrc.Gray = 0;
-		rrc.PosXMin = 0; rrc.PosXMax = 64; rrc.PosYMin = 0.0f; rrc.PosYMax = 64;
-
-		ph::rect<float> tc;
-		tc.bottom = 0.0f; tc.top = 32.0f;
 		
 		switch( _key )
 		{
 			case 'W':
 			{
-				tc.left = 64.0f; tc.right = 96.0f;
+				camera.Forward(0.1);
 				break;
 			}
 			case 'S':
 			{
-				tc.left = 96.0f; tc.right = 128.0f;
+				camera.Backward(0.1);
 				break;
 			}
 			case 'A':
 			{
-				tc.left = 0.0f; tc.right = 32.0f;
+				camera.Leftward(0.1);
 				break;
 			}
 			case 'D':
 			{
-				tc.left = 32.0f; tc.right = 64.0f;
+				camera.Rightward(0.1);
+				break;
+			}
+			case 'I':
+			{
+				camera.RotateAxisX(-5);
+				break;
+			}
+			case 'K':
+			{
+				camera.RotateAxisX(5);
+				break;
+			}
+			case 'J':
+			{
+				camera.RotateAxisY(-5);
+				break;
+			}
+			case 'L':
+			{
+				camera.RotateAxisY(5);
 				break;
 			}
 			default :
 			break;
 		}
-
-		rrc.TcXMin = tc.left / 205.0f;
-		rrc.TcXMax = tc.right / 205.0f;
-		rrc.TcYMin = tc.bottom / 115.0f;
-		rrc.TcYMax = tc.top / 115.0f;
-		rrc.Color = 0xffffffff;
-
-		tankWidget.Build(rrc, gTex, nullptr, 0);
-
-		char16_t message[] = u"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789中国智造，慧及全球。";
-
-		ph::UIText text;
-		text.x = 0;
-		text.y = 0;
-		text.size = 14;
-		text.length = sizeof(message) / sizeof(char16_t) - 1;
-		text.text = message;
-		text.color = 0xff0000ff;
-		text.charGap = 1.0f;
-		tankWidget.Build(text, 1);
-
-		tankWidget.End();
 	}
 }
 
@@ -197,22 +210,37 @@ void Application::OnMouseEvent( eMouseButton _bt , eMouseEvent _event, int _x, i
 	dy = _y - ly;
 	ly = _y;
 	lx = _x;
+
+	static bool MouseDownState = false;
+
+	static glm::vec2 lastPoint;
 	
 	switch( _event )
 	{
 		case MouseDown:
 		{
 			//ui->on_touch_event( _x, view->GetViewport()->top-_y, uiv2::Touch::touch_event_down, 0);
+			MouseDownState = true;
+			lastPoint.x = _x;
+			lastPoint.y = _y;
 			break;
 		}
 		case MouseUp:
 		{
 			//ui->on_touch_event(_x, view->GetViewport()->top - _y, uiv2::Touch::touch_event_up, 0);
+			MouseDownState = false;
 			break;
 		}
 		case MouseMove:
 		{
 			//ui->on_touch_event(_x, view->GetViewport()->top - _y, uiv2::Touch::touch_event_move, 0);
+			if (MouseDownState)
+			{
+				camera.RotateAxisY((_x - lastPoint.x) / 10.0f);
+				camera.RotateAxisX((_y - lastPoint.y) / 10.0f);
+				lastPoint.x = _x;
+				lastPoint.y = _y;
+			}
 			break;
 		}
 	}

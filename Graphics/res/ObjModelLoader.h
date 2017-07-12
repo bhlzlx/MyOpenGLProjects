@@ -1,76 +1,11 @@
 #pragma once
 
 #include <PhBase/Archive.h>
-#include <Graphics/BufferOGL.h>
-#include <Graphics/TexOGL.h>
-#include <vector>
-#include <res/TexPool.h>
+#include "../render/Model3D.h"
 
 
 namespace ph
 {
-	struct ObjVertData
-	{
-		vec3	pos;
-		vec3	norm;
-		vec2	tex;
-		ObjVertData()
-		{
-			pos.x = pos.y = pos.z = 0.0f;
-			norm.x = norm.y = norm.z = 0.0f;
-			tex.x = tex.y = 0.0f;
-		}
-	};
-
-	struct AABB
-	{
-		vec3 min;
-		vec3 max;
-	};
-
-	struct Material
-	{
-		char			name[32];
-		vec3			ambient; // 环境光
-		vec3			diffuse; // 散射光
-		vec3			specular; // 镜面反射颜色
-		float			shiness; // 镜面反射指数
-		TexOGLRef		texAmbient;
-		TexOGLRef		texDiffuse;
-		TexOGLRef		texHighlight;
-	};
-
-	struct ClientSideMesh
-	{
-		std::vector< ObjVertData >	vertices;
-		std::vector< unsigned int>  indices;
-		TexOGLRef					tex;
-		std::string					mtl;
-	};
-
-	struct ServerSideMesh
-	{
-		StaticVBORef	vbo;
-		StaticIBORef	ibo;
-		VertexArrayRef	vao;
-		AABB			aabb;
-		size_t			nElement;
-		size_t			material;
-	};
-
-	typedef std::vector< Material >			MaterialVector;
-	typedef ClientSideMesh					ClientMesh;
-	typedef ServerSideMesh					Mesh;
-	typedef std::vector< ClientSideMesh >	ClientMeshVector;
-	typedef std::vector< ServerSideMesh >	MeshVector;
-
-	struct Model3D
-	{
-		AABB				aabb;
-		MeshVector			vecMesh;
-		MaterialVector		vecMaterial;
-	};
-
 	inline ServerSideMesh CreateServerSideMesh(ClientSideMesh& _cm, MaterialVector& _materialVec )
 	{
 		ServerSideMesh mesh;
@@ -120,22 +55,22 @@ namespace ph
 		return mesh;
 	}
 
-	inline Model3D CreateModel3D(ClientMeshVector& _cmv, MaterialVector& _mv)
+	inline BasicModelRef CreateModel3D(ClientMeshVector& _cmv, MaterialVector& _mv)
 	{
-		Model3D m;
+		BasicModelRef model = BasicModelRef( new BasicModel() );
 		for (auto& _cm : _cmv)
 		{
-			m.vecMesh.push_back(CreateServerSideMesh(_cm, _mv));
+			model->meshes.push_back(CreateServerSideMesh(_cm, _mv));
 		}
-		m.vecMaterial = _mv;
+		model->materials = _mv;
 
-		vec3& min = m.aabb.min;
-		vec3& max = m.aabb.max;
+		vec3& min = model->aabb.min;
+		vec3& max = model->aabb.max;
 
-		if (m.vecMesh.size() > 0)
+		if (model->meshes.size() > 0)
 		{
-			m.aabb = m.vecMesh[0].aabb;
-			for (auto& subMesh : m.vecMesh )
+			model->aabb = model->meshes[0].aabb;
+			for (auto& subMesh : model->meshes )
 			{
 				auto& subAabbMin = subMesh.aabb.min;
 				auto& subAabbMax = subMesh.aabb.max;
@@ -149,12 +84,12 @@ namespace ph
 			}
 		}
 
-		return m;
+		return model;
 	}
 
 	inline bool LoadObjModel(const char * _model, ClientMeshVector& _data, MaterialVector& _vecMaterial);
 
-	inline Model3D CreateModel3D(const char * _objFile)
+	inline BasicModelRef CreateModel3D(const char * _objFile)
 	{
 		ClientMeshVector cmv;
 		MaterialVector mv;
@@ -163,7 +98,7 @@ namespace ph
 		{
 			return CreateModel3D(cmv, mv);
 		}
-		return Model3D();
+		return nullptr;
 	}
 
 	enum eModelPredef
@@ -171,11 +106,6 @@ namespace ph
 		eModelCube,
 		eModelBall,
 	};
-
-	inline Model3D CreateModel3D(int _pre)
-	{
-		
-	}
 
 	inline bool LoadObjMtl(const char * _mtl, std::vector<Material>& _material )
 	{
@@ -268,7 +198,7 @@ namespace ph
 				}
 			}
 			// 下一行
-			while (*ptr != '\n') { 
+			while (*ptr != '\n') {
 				if (!*ptr) 
 					return true;	
 				++ptr;
@@ -280,6 +210,9 @@ namespace ph
 
 	bool LoadObjModel(const char * _model, ClientMeshVector& _data, MaterialVector& _vecMaterial)
 	{
+		_vecMaterial.clear();
+		_vecMaterial.push_back(Material::Default());
+
 		Archive * arch = GetDefArchive();
 		IBlob * objBlob = arch->Open(_model);
 
@@ -379,18 +312,35 @@ namespace ph
 					int vd, td, nd;
 					for (size_t i = 0; i < faceParamN; ++i)
 					{
-						int r = sscanf(ReadSlots[i+1], "%d/%d/%d", &vd, &td, &nd);
-						switch (r)
+						int r1 = sscanf(ReadSlots[i + 1], "%d//%d", &vd, &nd);
+						int r2 = sscanf(ReadSlots[i+1], "%d/%d/%d", &vd, &td, &nd);
+						if (r1 == 2)
 						{
-						case 3:
-							ovd[i].norm = vecNorm[nd-1];
-						case 2:
-							ovd[i].tex = vecCoord[td-1];
-						case 1:
-							ovd[i].pos = vecVert[vd-1];
-							break;
-						default:
-							break;
+								ovd[i].norm = vecNorm[nd - 1];
+								ovd[i].pos = vecVert[vd - 1];
+						}
+						else
+						{
+							switch (r2)
+							{
+							case 3:
+								ovd[i].norm = vecNorm[nd - 1];
+							case 2:
+								ovd[i].tex = vecCoord[td - 1];
+							case 1:
+								ovd[i].pos = vecVert[vd - 1];
+								break;
+							default:
+								break;
+							}
+						}
+						
+						if (!curModel) // 有些模型没有材质，比如立方体，什么的
+						{
+							ClientSideMesh ms;
+							_data.push_back(ms);
+							curModel = &_data.back();
+							curModel->mtl = "";
 						}
 						curModel->vertices.push_back(ovd[i]);
 					}
@@ -407,9 +357,9 @@ namespace ph
 						curModel->indices.push_back(indicesN);
 						curModel->indices.push_back(indicesN + 1);
 						curModel->indices.push_back(indicesN + 2);
-						curModel->indices.push_back(indicesN);
 						curModel->indices.push_back(indicesN + 2);
 						curModel->indices.push_back(indicesN + 3);
+						curModel->indices.push_back(indicesN);
 					}
 				}
 			}

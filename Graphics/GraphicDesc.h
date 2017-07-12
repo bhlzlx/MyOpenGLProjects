@@ -127,6 +127,14 @@ namespace ph
 		PhSizeT				size;
 	};
 
+	enum eRenderMode
+	{
+		eRenderModePoint,
+		eRenderModeFill,
+		eRenderModeLine,
+	};
+
+
 	struct ClearOP
 	{
 		bool				bClearColor;
