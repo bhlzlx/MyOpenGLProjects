@@ -33,6 +33,11 @@ namespace ph
 		matViewDirty = true;
 	}
 
+	const glm::vec3& PhCamera::GetEye()
+	{
+		return eye;
+	}
+
 	void PhCamera::SetLookAt(glm::vec3 _lookAt)
 	{
 		lookAt = _lookAt;

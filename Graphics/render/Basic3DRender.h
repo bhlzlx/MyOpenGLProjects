@@ -72,7 +72,7 @@ namespace ph
 			lightColor = _color;
 		}
 
-		bool Begin(const glm::mat4x4& _matView, const glm::mat4x4& _matProj)
+		bool Begin(const glm::mat4x4& _matView, const glm::mat4x4& _matProj, const glm::vec4& _eye )
 		{
 			// 应用相机矩阵
 			matProj = _matProj;
@@ -89,6 +89,7 @@ namespace ph
 
 			transUBO->WriteData(&lightPos, sizeof(glm::mat4x4) * 3, sizeof(glm::vec4));
 			transUBO->WriteData(&lightColor, sizeof(glm::mat4x4) * 3 + sizeof(glm::vec4), sizeof(glm::vec4));
+			transUBO->WriteData(&_eye, sizeof(glm::mat4x4) * 3 + sizeof(glm::vec4) * 2, sizeof(glm::vec4));
 
 			return true;
 		}
@@ -110,7 +111,7 @@ namespace ph
 				memcpy(&c.Kd, &_model->materials[mesh.material].diffuse, sizeof(glm::vec4));
 				memcpy(&c.Ks, &_model->materials[mesh.material].specular, sizeof(glm::vec4));
 				c.shiness = _model->materials[mesh.material].shiness;
-				transUBO->WriteData(&c, sizeof(glm::mat4x4) * 3 + sizeof(glm::vec4) * 2, sizeof(c));
+				transUBO->WriteData(&c, sizeof(glm::mat4x4) * 3 + sizeof(glm::vec4) * 3, sizeof(c));
 
 				GLuint modes[] = {
 					GL_POINT,

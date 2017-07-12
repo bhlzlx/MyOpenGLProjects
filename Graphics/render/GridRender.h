@@ -1,11 +1,10 @@
 #pragma once
-
+#include <PhBase/PhBase.h>
 #include <Graphics/BufferOGL.h>
 #include <Graphics/RenderStateGL.h>
-#include <vector>
-#include <PhBase/PhBase.h>
-#include <ShaderOGL.h>
+#include <Graphics/ShaderOGL.h>
 #include <glm/glm.hpp>
+#include <vector>
 
 namespace ph
 {
