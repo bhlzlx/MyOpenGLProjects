@@ -153,7 +153,6 @@
     <ClInclude Include="render\Model3D.h" />
     <ClInclude Include="render\UIWidget.h" />
     <ClInclude Include="res\ObjModelLoader.h" />
-    <ClInclude Include="res\SceneLoader.h" />
     <ClInclude Include="res\TexPool.h" />
     <ClInclude Include="ShaderOGL.h" />
     <ClInclude Include="TexOGL.h" />
@@ -162,7 +161,6 @@
     <ClCompile Include="BufferOGL.cpp" />
     <ClCompile Include="GLView.cpp" />
     <ClCompile Include="gl\gl3w.c" />
-    <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="RenderStateGL.cpp" />
     <ClCompile Include="render\Basic3DRender.cpp" />
@@ -172,7 +170,6 @@
     <ClCompile Include="render\Model3D.cpp" />
     <ClCompile Include="render\UIWidget.cpp" />
     <ClCompile Include="res\ObjModelLoader.cpp" />
-    <ClCompile Include="res\SceneLoader.cpp" />
     <ClCompile Include="res\TexPool.cpp" />
     <ClCompile Include="ShaderOGL.cpp" />
     <ClCompile Include="TexOGL.cpp" />

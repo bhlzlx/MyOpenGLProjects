@@ -75,8 +75,8 @@ void Application::Start(void* _hwnd)
 	
 	//model = ph::CreateModel3D("./Teapot.obj");
 	//model = ph::CreateModel3D("./Low-Poly-Racing-Car.obj");
-	//model = ph::CreateModel3D("./Mickey_Mouse.obj");
-	model = ph::CreateModel3D("./low-poly-mill.obj");
+	model = ph::CreateModel3D("./Mickey_Mouse.obj");
+	//model = ph::CreateModel3D("./low-poly-mill.obj");
 	ph::AABB& aabb = model->aabb;
 
 	glm::vec3 modelCenter((aabb.min.x + aabb.max.x) / 2, (aabb.min.y + aabb.max.y) / 2, (aabb.min.z + aabb.max.z) / 2);
@@ -139,7 +139,12 @@ void Application::OnRender(unsigned long _tick)
 	gridRender->Draw();
 	render->Begin();
 	render->Draw(&tankWidget);
-	modelRender->Begin(matView, matProj);
+	static glm::vec4 eye;
+	eye.x = camera.GetEye().x;
+	eye.z = camera.GetEye().z;
+	eye.z = camera.GetEye().y;
+	eye.w = 1.0f;
+	modelRender->Begin(matView, matProj, eye);
 	modelRender->Draw(matModel, model, ph::eRenderModeFill);
 	modelRender->End();
     view->End();

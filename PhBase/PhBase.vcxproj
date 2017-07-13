@@ -163,7 +163,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="3RD\cjson\cJSON.c" />
-    <ClCompile Include="3RD\cjson\cJSON_Utils.c" />
     <ClCompile Include="3RD\libpng\png.c" />
     <ClCompile Include="3RD\libpng\pngerror.c" />
     <ClCompile Include="3RD\libpng\pngget.c" />

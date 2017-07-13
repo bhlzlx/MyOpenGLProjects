@@ -74,6 +74,8 @@ namespace ph
 
 		const glm::mat4x4& GetProjMatrix();
 
+		const glm::vec3& GetEye();
+
 	};
 
 }
