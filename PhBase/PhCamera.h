@@ -22,7 +22,7 @@ namespace ph
 		{
 			struct { float fov, aspect; };
 			struct { float left, right, bottom, top; };
-		} projParam;
+		};
 		float far;
 		float near;
 		// projection type

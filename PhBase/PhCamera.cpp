@@ -14,11 +14,11 @@ namespace ph
 		// projection
 		projType = ProjectionTypePerpective;
 		// projection matrix
-		projParam.fov = 120;
-		projParam.aspect = 4.0f / 3.0f;
+		fov = 120;
+		aspect = 4.0f / 3.0f;
 		near = 0.1f;
 		far = 1000;
-		matProj = glm::perspective(projParam.fov, projParam.aspect, near, far);
+		matProj = glm::perspective(fov, aspect, near, far);
 		matProjDirty = false;
 	}
 
@@ -67,11 +67,11 @@ namespace ph
 		{
 			if (projType == ProjectionTypePerpective)
 			{
-				matProj = glm::perspective(projParam.fov, projParam.aspect, near, far);
+				matProj = glm::perspective(fov, aspect, near, far);
 			}
 			else
 			{
-				matProj = glm::ortho<float>(projParam.left, projParam.right, projParam.bottom, projParam.top, near, far);
+				matProj = glm::ortho<float>(left, right, bottom, top, near, far);
 			}
 		}
 		matViewDirty = matProjDirty = false;
@@ -85,14 +85,14 @@ namespace ph
 
 	void PhCamera::Perspective(float _fov, float _aspect, float _near, float _far)
 	{
-		projParam.fov = _fov; projParam.aspect = _aspect;
+		fov = _fov; aspect = _aspect;
 		near = _near; far = _far;
 		matProjDirty = true;
 	}
 
 	void PhCamera::Ortho(float _left, float _right, float _bottom, float _top, float _near, float _far)
 	{
-		projParam.left = _left; projParam.right = _right; projParam.bottom = _bottom; projParam.top = _top;
+		left = _left; right = _right; bottom = _bottom; top = _top;
 		near = _near; far = _far;
 		matProjDirty = true;
 	}
