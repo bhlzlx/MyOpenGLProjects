@@ -20,6 +20,7 @@ namespace ph
 		SamplerSlotRef			diffuseTexSlot;		// 散射采样纹理
 		SamplerSlotRef			ambientTexSlot;		// 环境光采样纹理
 		SamplerSlotRef			specTexSlot;		// 高光采样纹理
+		SamplerSlotRef			normalTexSlot;		// 法线贴图
 
 		RenderStateGL			renderState;		// 渲染状态
 		
@@ -47,6 +48,7 @@ namespace ph
 			diffuseTexSlot = shader->GetSamplerSlot("diffuse_texture");
 			ambientTexSlot = shader->GetSamplerSlot("ambient_texture");
 			specTexSlot = shader->GetSamplerSlot("specular_texture");
+			normalTexSlot = shader->GetSamplerSlot("normal_texture");
 			ph::SamplerState ss;
 			ss.MagFilter = ph::TEX_FILTER_POINT;
 			ss.MinFilter = ph::TEX_FILTER_POINT;
@@ -103,6 +105,7 @@ namespace ph
 				this->diffuseTexSlot->BindTexture(_model->materials[mesh.material].texDiffuse.get() );
 				this->specTexSlot->BindTexture(_model->materials[mesh.material].texHighlight.get());
 				this->ambientTexSlot->BindTexture(_model->materials[mesh.material].texAmbient.get());
+				this->normalTexSlot->BindTexture(_model->materials[mesh.material].texBumpmap.get());
 				struct {
 					glm::vec4 Ka, Kd, Ks;
 					float shiness;

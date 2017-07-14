@@ -2,10 +2,25 @@
 
 #include <PhBase/Archive.h>
 #include "../render/Model3D.h"
+#include <glm/glm.hpp>
 
 
 namespace ph
 {
+	glm::vec3 CalTangent( glm::vec3* _P, glm::vec2 * _UV )
+	{
+		glm::vec3 deltP[2] = { _P[1] - _P[0], _P[2] - _P[0] };
+		glm::vec2 deltUV[2] = { _UV[1] - _UV[0], _UV[2] - _UV[0] };
+		float f = 1.0f / (deltUV[0].x * deltUV[1].y - deltUV[1].x * deltUV[0].y);
+		glm::vec3 tangent;
+
+		tangent.x = f * (deltUV[1].y * deltP[0].x - deltUV[0].y * deltP[1].x);
+		tangent.y = f * (deltUV[1].y * deltP[0].y - deltUV[0].y * deltP[1].y);
+		tangent.z = f * (deltUV[1].y * deltP[0].z - deltUV[0].y * deltP[1].z);
+
+		return tangent;
+	}
+
 	inline ServerSideMesh CreateServerSideMesh(ClientSideMesh& _cm, MaterialVector& _materialVec )
 	{
 		ServerSideMesh mesh;
@@ -16,6 +31,7 @@ namespace ph
 			{0, 3, GL_FLOAT, sizeof(ObjVertData), 0 },
 			{1, 3, GL_FLOAT, sizeof(ObjVertData), (GLvoid*) (sizeof(float) * 3) },
 			{2, 2, GL_FLOAT, sizeof(ObjVertData), (GLvoid*) (sizeof(float) * 6) },
+			{3, 3, GL_FLOAT, sizeof(ObjVertData), (GLvoid*) (sizeof(float) * 8) },
 			{0}
 		};
 		VertexArrayRef vao = VertexArray::New( vbo.get(), ibo.get(), &layout[0]);
@@ -196,6 +212,12 @@ namespace ph
 					texFile = Archive::FormatFilePath(texFile);
 					current->texHighlight = TexPool::Get(texFile.c_str());
 				}
+				else if (strcmp(ReadSlots[0], "bump") == 0) // 镜面光贴图
+				{
+					std::string texFile = dirPath + ReadSlots[1];
+					texFile = Archive::FormatFilePath(texFile);
+					current->texBumpmap = TexPool::Get(texFile.c_str());
+				}
 			}
 			// 下一行
 			while (*ptr != '\n') {
@@ -342,6 +364,19 @@ namespace ph
 							curModel = &_data.back();
 							curModel->mtl = "";
 						}
+					}
+
+					std::vector<glm::vec3> vecPos;
+					std::vector<glm::vec2> vecUv;
+					for (size_t i = 0; i < 3; ++i)
+					{
+						vecPos.push_back(glm::vec3(ovd[i].pos.x, ovd[i].pos.y, ovd[i].pos.z) );
+						vecUv.push_back(glm::vec2(ovd[i].tex.x, ovd[i].pos.y));
+					}
+					glm::vec3 tangent = CalTangent(vecPos.data(), vecUv.data());
+					for (size_t i = 0; i < faceParamN; ++i)
+					{
+						ovd[i].tangent = { tangent.x, tangent.y, tangent.z };
 						curModel->vertices.push_back(ovd[i]);
 					}
 					unsigned int indicesN = curModel->vertices.size();

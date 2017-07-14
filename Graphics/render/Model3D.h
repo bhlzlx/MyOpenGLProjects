@@ -12,6 +12,7 @@ namespace ph
 		vec3	pos;
 		vec3	norm;
 		vec2	tex;
+		vec3	tangent;
 		ObjVertData()
 		{
 			pos.x = pos.y = pos.z = 0.0f;
@@ -36,6 +37,7 @@ namespace ph
 		TexOGLRef		texAmbient;
 		TexOGLRef		texDiffuse;
 		TexOGLRef		texHighlight;
+		TexOGLRef		texBumpmap;
 		static Material Default()
 		{
 			Material mtl;
@@ -44,7 +46,7 @@ namespace ph
 			mtl.diffuse = { 0.5f, 0.5f, 0.5f };
 			mtl.specular = { 0.2f, 0.2f, 0.2f };
 			mtl.shiness = 254;
-			mtl.texDiffuse = mtl.texHighlight = mtl.texAmbient = TexPool::GetWhite();
+			mtl.texDiffuse = mtl.texHighlight = mtl.texAmbient = mtl.texBumpmap = TexPool::GetWhite();
 			return mtl;
 		}
 	};

@@ -3,6 +3,7 @@
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 norm;
 layout (location = 2) in vec2 coord;
+layout (location = 3) in vec3 tangent;
 
 layout (std140) uniform RenderParam{
 	mat4 proj;		// MVP矩阵
@@ -23,6 +24,7 @@ struct FragmentIn
 	vec4	Eyed;		//
 	vec2	coord;		// 纹理参数
 	vec4	norm;
+	vec4    tangent;
 	vec4	ambient;
 	vec4	diffuse;
 	vec4	specular;
@@ -36,6 +38,7 @@ void main()
     fragmentIn.coord = coord;
 	fragmentIn.shiness = shiness;
 	fragmentIn.norm = normalize( model * vec4(norm,0.0) ); // 变换后的法线
+	fragmentIn.tangent = normalize( model * vec4(tangent, 0) );
 	
 	vec4 modelPos = model * vec4( pos, 1.0);
 	fragmentIn.Eyed = normalize(Eyep - modelPos);	
