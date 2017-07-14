@@ -42,7 +42,7 @@ void main()
 	vec4 Color = texture2D( ambient_texture, fragmentIn.coord.st ) * fragmentIn.ambient;
 
 	vec4 finalNormal = GetNormalMapNormal();
-	float diff = max( dot( -fragmentIn.Ld, finalNormal ) , 0.0);
+	float diff = max( dot( fragmentIn.Ld, finalNormal ) , 0.0);
 
 	Color += texture2D( diffuse_texture, fragmentIn.coord.st ) * diff;
 
