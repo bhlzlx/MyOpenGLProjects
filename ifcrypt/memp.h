@@ -112,6 +112,7 @@ namespace iflib
 				}
 				else
 				{
+					// 回收的指针在内存块中,但是指针可能已经被回收了,或者指针根本没有对齐到结构体上
 					MEMPException except;
 					except.oper = MEMPException::MemOperFree;
 					throw except;
@@ -155,14 +156,14 @@ namespace iflib
 				if (block->free)
 				{
 					ptr = block->Alloc();
-					return new(ptr)T( _param );
+					return new(ptr)T( std::forward<PARAM>(_param) );
 					//return (T*)ptr;
 				}
 				block = block->next;
 			}
 			Grow();
 			ptr = last->Alloc();
-			return (T*)ptr;
+			return new(ptr)T(std::forward<PARAM>(_param));
 		}
 
 		template< class PARAM1, class PARAM2 >
@@ -177,14 +178,14 @@ namespace iflib
 				if (block->free)
 				{
 					ptr = block->Alloc();
-					return new(ptr)T(_param1, _param2);
+					return new(ptr)T(std::forward<PARAM1>(_param1), std::forward<PARAM2>(_param2));
 					//return (T*)ptr;
 				}
 				block = block->next;
 			}
 			Grow();
 			ptr = last->Alloc();
-			return (T*)ptr;
+			return new(ptr)T(std::forward<PARAM1>(_param1), std::forward<PARAM2>(_param2));
 		}
 
 		template< class PARAM1, class PARAM2, class PARAM3>
@@ -199,14 +200,14 @@ namespace iflib
 				if (block->free)
 				{
 					ptr = block->Alloc();
-					return new(ptr)T(_param1, _param2, _param3);
+					return new(ptr)T(std::forward<PARAM1>(_param1), std::forward<PARAM2>(_param2), std::forward<PARAM3>(_param3));
 					//return (T*)ptr;
 				}
 				block = block->next;
 			}
 			Grow();
 			ptr = last->Alloc();
-			return (T*)ptr;
+			return new(ptr)T(std::forward<PARAM1>(_param1), std::forward<PARAM2>(_param2), std::forward<PARAM3>(_param3));
 		}
 
 		template< class PARAM1, class PARAM2, class PARAM3, class PARAM4>
@@ -221,14 +222,14 @@ namespace iflib
 				if (block->free)
 				{
 					ptr = block->Alloc();
-					return new(ptr)T(_param1, _param2, _param3, _param4);
+					return new(ptr)T(std::forward<PARAM1>(_param1), std::forward<PARAM2>(_param2), std::forward<PARAM3>(_param3), std::forward<PARAM3>(_param4));
 					//return (T*)ptr;
 				}
 				block = block->next;
 			}
 			Grow();
 			ptr = last->Alloc();
-			return (T*)ptr;
+			return new(ptr)T(std::forward<PARAM1>(_param1), std::forward<PARAM2>(_param2), std::forward<PARAM3>(_param3), std::forward<PARAM3>(_param4));
 		}
 
 		T* Alloc()
