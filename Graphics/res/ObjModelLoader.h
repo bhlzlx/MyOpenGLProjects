@@ -7,17 +7,17 @@
 
 namespace ph
 {
+	// _P : 三角形的三个顶点位置
+	// _UV : 三角形三个点的UV坐标
 	glm::vec3 CalTangent( glm::vec3* _P, glm::vec2 * _UV )
 	{
 		glm::vec3 deltP[2] = { _P[1] - _P[0], _P[2] - _P[0] };
 		glm::vec2 deltUV[2] = { _UV[1] - _UV[0], _UV[2] - _UV[0] };
 		float f = 1.0f / (deltUV[0].x * deltUV[1].y - deltUV[1].x * deltUV[0].y);
 		glm::vec3 tangent;
-
 		tangent.x = f * (deltUV[1].y * deltP[0].x - deltUV[0].y * deltP[1].x);
 		tangent.y = f * (deltUV[1].y * deltP[0].y - deltUV[0].y * deltP[1].y);
 		tangent.z = f * (deltUV[1].y * deltP[0].z - deltUV[0].y * deltP[1].z);
-
 		return tangent;
 	}
 

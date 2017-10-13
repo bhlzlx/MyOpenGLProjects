@@ -50,6 +50,20 @@ namespace ph
 		}
 	};
 
+	struct DepthAttachmentOGL
+	{
+		// depth texture
+		TexOGLRef 
+		DepthAttachmentOGL()
+		{
+
+		}
+		~DepthAttachmentOGL()
+		{
+			
+		}
+	};
+
 	struct DepthStencilAttachmentOGL
 	{
 		TexOGL* texture;
